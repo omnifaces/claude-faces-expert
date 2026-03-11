@@ -65,6 +65,15 @@ This is a significant migration; confirm scope with developer before proceeding.
       version="2.3"
   >
   ```
+- Update `*.taglib.xml` version to `2.3`.
+  ```xml
+  <facelet-taglib 
+      xmlns="https://xmlns.jcp.org/xml/ns/javaee"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="https://xmlns.jcp.org/xml/ns/javaee https://xmlns.jcp.org/xml/ns/javaee/web-facelettaglibrary_2_3.xsd"
+      version="2.3"
+  >
+  ```
 - Update XML namespaces from `java.sun.com` to `xmlns.jcp.org` (if on JSF 2.2+).
 - Use HTML5 doctype `<!DOCTYPE html>` (if on JSF 2.2+).
 - Review for new 2.3 features to adopt: https://arjan-tijms.omnifaces.org/p/jsf-23.html
@@ -91,6 +100,15 @@ This is purely a package rename; no behavioral changes.
       xmlns="https://jakarta.ee/xml/ns/jakartaee"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-facesconfig_3_0.xsd"
+      version="3.0"
+  >
+  ```
+- Update `*.taglib.xml` namespace and version to `3.0`.
+  ```xml
+  <facelet-taglib 
+      xmlns="https://jakarta.ee/xml/ns/jakartaee"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-facelettaglibrary_3_0.xsd"
       version="3.0"
   >
   ```
@@ -121,6 +139,15 @@ This is purely a package rename; no behavioral changes.
       version="4.0"
   >
   ```
+- Update `*.taglib.xml` version to `4.0`.
+  ```xml
+  <facelet-taglib 
+      xmlns="https://jakarta.ee/xml/ns/jakartaee"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-facelettaglibrary_4_0.xsd"
+      version="4.0"
+  >
+  ```
 - Use HTML5 doctype `<!DOCTYPE html>` (if not already).
 - Review for new 4.0 features to adopt: https://balusc.omnifaces.org/2021/11/whats-new-in-faces-40.html
 
@@ -133,6 +160,15 @@ This is purely a package rename; no behavioral changes.
       xmlns="https://jakarta.ee/xml/ns/jakartaee"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-facesconfig_4_1.xsd"
+      version="4.1"
+  >
+  ```
+- Update `*.taglib.xml` version to `4.1`.
+  ```xml
+  <facelet-taglib 
+      xmlns="https://jakarta.ee/xml/ns/jakartaee"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-facelettaglibrary_4_1.xsd"
       version="4.1"
   >
   ```
