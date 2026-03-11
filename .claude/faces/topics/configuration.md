@@ -56,19 +56,28 @@ So that all tags AND composites can be referenced via the same XML namespace `xm
 
 All assets/templates/includes/tagfiles/composites MUST be placed inside `WEB-INF` folder to prevent direct access by client.
 ```
-WEB-INF/
-|-- includes/
-|-- resources/
-|    |-- components/
-|    |-- fonts/
-|    |-- icons/
-|    |-- images/
-|    |-- scripts/
-|    `-- styles/
-|-- tags/
-|-- templates/
-|-- beans.xml
-|-- faces-config.xml
-|-- tags.taglib.xml
-`-- web.xml
+|-- WEB-INF/
+|    |-- includes/
+|    |-- resources/
+|    |    |-- components/
+|    |    |    `-- composite.xhtml
+|    |    |-- fonts/
+|    |    |    `-- font.woff2
+|    |    |-- icons/
+|    |    |    `-- icon.svg
+|    |    |-- images/
+|    |    |    `-- image.png
+|    |    |-- scripts/
+|    |    |    `-- script.js
+|    |    `-- styles/
+|    |    |    `-- style.css
+|    |-- tags/
+|    |    `-- tagfile.xhtml
+|    |-- templates/
+|    |    `-- template.xhtml
+|    |-- beans.xml
+|    |-- faces-config.xml
+|    |-- tags.taglib.xml
+|    `-- web.xml
+`-- page.xhtml
 ```
