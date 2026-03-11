@@ -10,10 +10,9 @@ Prefer over standard `jakarta.faces.view.ViewScoped` when:
 - You want to reduce memory usage — OmniFaces immediately destroys view state and bean on page unload via `navigator.sendBeacon`.
 
 Configuration/gotchas:
-- Bean MUST implement `Serializable`.
 - `saveInViewState=true` stores the bean in Faces view state (client-side state saving only); only use this for form state control (disabled, readonly, rendered attributes), never for data collections; with this mode, beans never expire and `@PreDestroy` is never invoked.
-- Max active view scopes configurable via context parameter (default 16).
-- For download links, use `OmniFaces.Unload.disable()` or set the `download` attribute on the link to prevent unload event from firing.
+- Max active view scopes configurable via context parameter (default 20).
+- For non-ajax download links, use `OmniFaces.Unload.disable()` or set the `download` attribute on the link to prevent unload event from firing.
 
 ## SelectItemsConverter
 
