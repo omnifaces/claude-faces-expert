@@ -1,11 +1,13 @@
 # Jakarta Faces Diagnostic Decision Trees
 
+*Version 1.0.0*
+
 When a user reports one of these symptoms, walk through the causes in order.
 Each cause has a check (how to verify) and a fix (how to resolve).
 
 ## Action Not Invoked
 
-Symptom: `UICommand` or `AjaxBehavior` does nothing when invoked.
+Symptom: `UICommand` or `AjaxBehavior` don't reach the backing bean action/listener method when the form is submitted.
 
 1. **Outside `UIForm`**: The command component must be inside `UIForm`, not plain HTML `<form>`.
 2. **Nested `UIForm`**: HTML doesn't allow nested forms.
@@ -62,7 +64,7 @@ Symptom: `jakarta.faces.application.ViewExpiredException: viewId:/page.xhtml - V
    Configure ExceptionHandler redirect.
 4. **Missing ViewState hidden field**: Check HTML source.
    Ensure JavaScript isn't removing it.
-5. **Too many tabs**: Increase `com.sun.faces.numberOfLogicalViews` / `com.sun.faces.numberOfViewsInSession` (Mojarra) or `org.apache.myfaces.NUMBER_OF_VIEWS_IN_SESSION` (MyFaces).
+5. **Too many tabs**: Increase `com.sun.faces.numberOfLogicalViews` (Mojarra) or `org.apache.myfaces.NUMBER_OF_VIEWS_IN_SESSION` (MyFaces).
 6. **Cluster without session replication**: Enable session replication (sticky sessions).
 7. **Cluster with session replication**: Put `<distributable/>` flag in `web.xml` so Servlet runtime and Faces runtime performs more aggressive session dirtying and HTTP sessions (including view scoped beans) are properly synced across servers.
 8. **Client-side state saving in cluster ("MAC did not verify")**: Client-side state is AES-encrypted.
@@ -71,7 +73,7 @@ Symptom: `jakarta.faces.application.ViewExpiredException: viewId:/page.xhtml - V
    In production, configure this in the server's JNDI environment.
    For local development only, you can use `<env-entry>` in `web.xml`.
    Generate a key with: `KeyGenerator.getInstance("AES").init(256)` then `Base64.getEncoder().encodeToString(key.getEncoded())`.
-   Never publish/opensource the key.
+   NEVER publish/opensource the key.
 9. **Mojarra `clientStateTimeout`**: The context-param `com.sun.faces.clientStateTimeout` (seconds) causes ViewExpiredException when client-side state exceeds the configured age.
    Check `web.xml` for this param.
 10. **State saving method**: As last resort: set `jakarta.faces.STATE_SAVING_METHOD` to `client` in `web.xml` for client-side state.
@@ -92,7 +94,7 @@ Symptom: `Validation Error: Value is not valid` on `UISelectOne`/`UISelectMany` 
 
 ## Input Value Not Updated / Setter Not Called
 
-Symptom: `UIInput` values don't reach the backing bean setter.
+Symptom: `UIInput` values don't reach the backing bean setter when form is submitted.
 
 1. **Conversion/Validation error on another field**: If ANY field fails validation, ALL setters are skipped.
    Add `UIMessages` to the form to ensure that all errors are caught.
@@ -101,7 +103,7 @@ Symptom: `UIInput` values don't reach the backing bean setter.
 4. **Using `binding` instead of `value`**: `binding` is for component instances, not data.
    Use `value`.
 5. **`disabled` or `readonly`**: Disabled inputs are not submitted by browser and readonly inputs are not processed by Faces.
-6. **`<f:ajax execute>`/`<p:ajax process>` of `UICommand` excludes the `UIInput``**: Add the input ID or set to `execute="@form"`/`process="@form"`.
+6. **`<f:ajax execute>`/`<p:ajax process>` of `UICommand` excludes the `UIInput`**: Add the input ID or set to `execute="@form"`/`process="@form"`.
 7. **Getter creates new wrapper object each call**: Initialize in `@PostConstruct` and return same instance.
 
 ## Component Not Found for Update/Render

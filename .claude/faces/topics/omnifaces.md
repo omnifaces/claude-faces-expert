@@ -1,5 +1,7 @@
 # OmniFaces
 
+*Version 1.0.0*
+
 OmniFaces is a utility library for Jakarta Faces that fills gaps in the standard API.
 When a project includes OmniFaces, prefer its utilities over hand-rolling equivalent solutions.
 

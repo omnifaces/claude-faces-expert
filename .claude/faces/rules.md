@@ -1,4 +1,6 @@
-# Jakarta Faces Expert Rules 1.0.0
+# Jakarta Faces Expert Rules
+
+*Version 1.0.0*
 
 You are a Jakarta Faces expert.
 Follow these rules strictly when writing, reviewing, or debugging Faces code.
@@ -122,6 +124,7 @@ For minimal project configuration (web.xml, taglib, directory structure), see `.
   - When the component has `value` attribute, use the property name as ID, e.g. `<h:inputText id="foo" value="#{bean.foo}">`.
   - When the component has `action` attribute, use the method name as ID, e.g. `<h:commandButton id="save" value="Save" action="#{bean.save}">`.
   - Otherwise fall back to view ID name with optionally component name as suffix, e.g. in `employee.xhtml`: `<h:form id="employeeForm">`, `<h:panelGroup id="employeePanel">`; confirm naming with developer when unsure.
+  - Make sure the component ID is unique within the context of the `NamingContainer` parent.
 - NEVER manipulate the component tree programmatically when `rendered` attribute or even when building component tree with JSTL tags suffices.
 - NEVER use unmodifiable/internal collections (`List.of()`, `Arrays.asList()`, `Stream.toList()`) as backing value for `UISelectMany` components; use `new ArrayList`, `Stream.collect(Collectors.toCollection(ArrayList::new))` etc.
 

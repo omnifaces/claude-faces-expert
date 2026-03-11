@@ -1,5 +1,7 @@
 # Minimal Faces Configuration
 
+*Version 1.0.0*
+
 ## web.xml
 
 `WEB-INF/web.xml` MUST minimally have this configuration:

@@ -6,6 +6,8 @@ argument-hint: "[file or directory, defaults to current project]"
 allowed-tools: Read, Glob, Grep, Agent
 ---
 
+*Version 1.0.0*
+
 Review the Jakarta Faces code in `$ARGUMENTS` (if no argument, scan the project for `.xhtml` and backing bean files) against the rules in `.claude/faces/rules.md` and its topic files.
 
 ## Review Checklist
