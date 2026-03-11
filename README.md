@@ -3,7 +3,6 @@
 Drop-in Jakarta Faces knowledge base for [Claude Code](https://claude.com/claude-code).
 Makes Claude Code more aware of Jakarta Faces (formerly JSF) best practices, common pitfalls, and diagnostic decision trees.
 No special context needed, just make sure that `@.claude/faces/rules.md` is referenced in your `CLAUDE.md`.
-Also adds two helpful slash commands `/faces-review` and `/faces-migrate`.
 
 Curated by [BalusC](https://balusc.org) based on his Stack Overflow answers to frequently asked Jakarta Faces questions.
 
@@ -48,6 +47,12 @@ Then add this line to your `CLAUDE.md` (create one if it doesn't exist):
 ```
 Jakarta Faces rules: @.claude/faces/rules.md
 ```
+
+## How it Works
+
+Once referenced in `CLAUDE.md`, the expert rules are active.
+You don't need to change your workflow or use special prompts; Claude simply becomes more capable, providing higher-quality Jakarta Faces code and architectural advice by default.
+It also adds two helpful slash commands `/faces-review` and `/faces-migrate`.
 
 ## Slash Commands
 
