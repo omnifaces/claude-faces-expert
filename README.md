@@ -19,25 +19,33 @@ Curated by [BalusC](https://balusc.org) based on his Stack Overflow answers to f
 
 ## Installation
 
-### 1. Install the knowledge base into your project
+From your project root, run:
 
 ```sh
-# From your project root
 curl -sL https://raw.githubusercontent.com/omnifaces/claude-faces-expert/main/install.sh | sh
 ```
 
+This copies the knowledge base and slash commands into `.claude/`, and adds the `@.claude/faces/rules.md` reference to your `CLAUDE.md` (creates it if needed).
+
 To update later, re-run the same command.
 
-### 2. Reference from your CLAUDE.md
+### Manual installation
 
-Add this line to your project's `CLAUDE.md` (create one if it doesn't exist):
+If you don't want to run `curl` based installers, you can install manually as follows:
+
+```sh
+git clone https://github.com/omnifaces/claude-faces-expert /tmp/claude-faces-expert
+mkdir -p .claude/faces .claude/skills
+cp -r /tmp/claude-faces-expert/.claude/faces/* .claude/faces/
+cp -r /tmp/claude-faces-expert/.claude/skills/* .claude/skills/
+rm -rf /tmp/claude-faces-expert
+```
+
+Then add this line to your `CLAUDE.md` (create one if it doesn't exist):
 
 ```
 Jakarta Faces rules: @.claude/faces/rules.md
 ```
-
-The `@` prefix tells Claude Code to include the file.
-Claude Code will now follow Jakarta Faces best practices when working on your project.
 
 ## Slash Commands
 
