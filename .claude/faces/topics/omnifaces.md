@@ -43,11 +43,11 @@ Standard Faces shows nothing useful for ajax exceptions in Production stage.
 
 Causes scoped beans to be instantiated eagerly at the start of their scope instead of lazily on first EL reference.
 
-- Supported scopes: `@RequestScoped`, `@ViewScoped`, `@SessionScoped`, `@ApplicationScoped`.
+- Supported scopes: `@RequestScoped`, `@ViewScoped` (both Faces and OmniFaces), `@SessionScoped`, `@ApplicationScoped`.
 - For `@RequestScoped`/`@ViewScoped`, specify `requestURI` or `viewId` attribute to control when.
-- `requestURI`: instantiation before first servlet filter (FacesContext NOT available in `@PostConstruct`).
-- `viewId`: instantiation during Restore View phase (FacesContext available).
-- For `@ApplicationScoped`: use `@Startup` stereotype as shorthand.
+  - `requestURI`: instantiation before first servlet filter (FacesContext NOT available in `@PostConstruct`).
+  - `viewId`: instantiation during Restore View phase (FacesContext available).
+- For `@ApplicationScoped`: use `@org.omnifaces.cdi.Startup` stereotype as shorthand for `@Eager @ApplicationScoped`.
 
 ## @RateLimit / RateLimiter
 
