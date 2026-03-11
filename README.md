@@ -19,30 +19,14 @@ Curated by [BalusC](https://balusc.org) based on his Stack Overflow answers to f
 
 ## Installation
 
-### 1. Copy the knowledge base into your project
-
-**Either** manually clone this repo and copy the files:
+### 1. Install the knowledge base into your project
 
 ```sh
 # From your project root
-git clone https://github.com/balusc/claude-faces-expert /tmp/claude-faces-expert
-mkdir -p .claude/faces .claude/skills
-cp -r /tmp/claude-faces-expert/.claude/faces/* .claude/faces/
-cp -r /tmp/claude-faces-expert/.claude/skills/* .claude/skills/
-rm -rf /tmp/claude-faces-expert
+curl -sL https://raw.githubusercontent.com/omnifaces/claude-faces-expert/main/install.sh | sh
 ```
 
-**Or** add as a `git subtree` (includes both knowledge base and slash commands):
-
-```sh
-git subtree add --prefix .claude https://github.com/balusc/claude-faces-expert.git main --squash
-```
-
-So you can effortlessly pull updates later:
-
-```sh
-git subtree pull --prefix .claude https://github.com/balusc/claude-faces-expert.git main --squash
-```
+To update later, re-run the same command.
 
 ### 2. Reference from your CLAUDE.md
 
