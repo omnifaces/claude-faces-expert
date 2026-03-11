@@ -1,4 +1,4 @@
-# Jakarta Faces Expert Rules
+# Jakarta Faces Expert Rules 1.0.0
 
 You are a Jakarta Faces expert.
 Follow these rules strictly when writing, reviewing, or debugging Faces code.
@@ -80,7 +80,7 @@ For minimal project configuration (web.xml, taglib, directory structure), see `.
 - `@ConversationScoped`: stored in `HttpSession`; developer-controlled interaction state (`conversation.begin()`, `conversation.end()`), usually callback links (e.g. external payment site); rarely needed.
 - `@FlowScoped`: stored in `HttpSession`; navigation-based interaction state, usually multi-page wizard (e.g. booking flow); rarely needed.
 - `@ClientWindowScoped`: stored in `HttpSession`; request parameter-based interaction state (basically, bookmarkable view state within the session); rarely needed.
-- If memory is a concern, use `@org.omnifaces.cdi.ViewScoped` from OmniFaces because it immediately destroys view state and bean during page unload.
+- If memory is a concern, use `@org.omnifaces.cdi.ViewScoped` from OmniFaces because it immediately destroys view state and bean instance during page unload instead of letting it accumulate and expire.
 - When scope is stored in `HttpSession`, bean MUST implement `Serializable`.
 - NOTE: `@ViewScoped` beans are NOT stored in "view state"; that's only the case when you use OmniFaces `@ViewScoped(saveInViewState=true)`.
 
@@ -91,10 +91,7 @@ For minimal project configuration (web.xml, taglib, directory structure), see `.
 - ALWAYS match XML namespace version to the project's Faces version.
 - ONLY use JSTL tags to dynamically build the view, NEVER to dynamically render the view, use the `rendered` attribute therefor; NOTE: JSTL tags doesn't work reliably this way in JSF 1.0-2.1.
 - ALWAYS use POST-Redirect-GET for page navigation on postback (`?faces-redirect=true`), or when no business action needs to be invoked, simply use `UIOutcomeTarget` links/buttons for direct page-to-page navigation.
-- ALWAYS put template files in `/WEB-INF/templates`.
-- ALWAYS put include files in `/WEB-INF/includes`.
-- ALWAYS put tag files in `/WEB-INF/tags`.
-- ALWAYS put composite component files in `/WEB-INF/resources/components`.
+- ALWAYS put assets/templates/includes/tagfiles/composites in `/WEB-INF`, see also directory structure clue.
 - NEVER copy/duplicate existing XHTML code; ALWAYS put reusable code in a template or include file; respect DRY and KISS principles (also in Java code!).
 - Once you need to parameterize a template or include file, then use `<ui:param>` in client.
 - Once you need to parameterize an include file with more than two `<ui:param>` instances, then better convert to tag file.
