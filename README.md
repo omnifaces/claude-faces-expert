@@ -1,7 +1,7 @@
 # Claude Faces Expert
 
 Drop-in Jakarta Faces knowledge base for [Claude Code](https://claude.com/claude-code).
-Makes Claude Code aware of Jakarta Faces (formerly JSF) best practices, common pitfalls, and diagnostic decision trees.
+Makes Claude Code more aware of Jakarta Faces (formerly JSF) best practices, common pitfalls, and diagnostic decision trees.
 
 Curated by [BalusC](https://balusc.org) based on his Stack Overflow answers to frequently asked Jakarta Faces questions.
 
@@ -21,6 +21,8 @@ Curated by [BalusC](https://balusc.org) based on his Stack Overflow answers to f
 
 ### 1. Copy the knowledge base into your project
 
+**Either** manually clone this repo and copy the files:
+
 ```sh
 # From your project root
 git clone https://github.com/balusc/claude-faces-expert /tmp/claude-faces-expert
@@ -36,7 +38,7 @@ rm -rf /tmp/claude-faces-expert
 git subtree add --prefix .claude https://github.com/balusc/claude-faces-expert.git main --squash
 ```
 
-To pull updates later:
+So you can effortlessly pull updates later:
 
 ```sh
 git subtree pull --prefix .claude https://github.com/balusc/claude-faces-expert.git main --squash
