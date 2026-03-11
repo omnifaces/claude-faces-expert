@@ -24,21 +24,22 @@ Curated by [BalusC](https://balusc.org) based on his Stack Overflow answers to f
 ```sh
 # From your project root
 git clone https://github.com/balusc/claude-faces-expert /tmp/claude-faces-expert
-mkdir -p .claude/faces
+mkdir -p .claude/faces .claude/skills
 cp -r /tmp/claude-faces-expert/.claude/faces/* .claude/faces/
+cp -r /tmp/claude-faces-expert/.claude/skills/* .claude/skills/
 rm -rf /tmp/claude-faces-expert
 ```
 
-**Or** add as a `git subtree`:
+**Or** add as a `git subtree` (includes both knowledge base and slash commands):
 
 ```sh
-git subtree add --prefix .claude/faces https://github.com/balusc/claude-faces-expert.git main --squash
+git subtree add --prefix .claude https://github.com/balusc/claude-faces-expert.git main --squash
 ```
 
-So you can easily pull updates later:
+To pull updates later:
 
 ```sh
-git subtree pull --prefix .claude/faces https://github.com/balusc/claude-faces-expert.git main --squash
+git subtree pull --prefix .claude https://github.com/balusc/claude-faces-expert.git main --squash
 ```
 
 ### 2. Reference from your CLAUDE.md
@@ -51,15 +52,6 @@ Jakarta Faces rules: @.claude/faces/rules.md
 
 The `@` prefix tells Claude Code to include the file.
 Claude Code will now follow Jakarta Faces best practices when working on your project.
-
-### 3. Copy the slash commands into your project
-
-```sh
-mkdir -p .claude/skills
-cp -r /tmp/claude-faces-expert/.claude/skills/* .claude/skills/
-```
-
-When using `git subtree`, the skills are already included.
 
 ## Slash Commands
 
