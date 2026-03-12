@@ -248,7 +248,7 @@ Key points:
 
 Usage in a page (with taglib namespace `xmlns:t="tags"`):
 ```xml
-<t:confirmButton value="Delete" confirmMessage="Delete this employee?">
+<t:confirmButton id="delete" value="Delete" confirmMessage="Delete this employee?">
     <f:actionListener for="action" binding="#{employeesBacking.delete(employee)}" />
 </t:confirmButton>
 ```
