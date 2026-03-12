@@ -38,6 +38,17 @@
 </servlet-mapping>
 ```
 
+## faces-config.xml
+
+`WEB-INF/faces-config.xml` MUST minimally have this configuration:
+```xml
+<application>
+    <locale-config>
+        <default-locale>en</default-locale> <!-- Set to your default locale. -->
+    </locale-config>
+</application>
+```
+
 ## tags.taglib.xml
 
 The taglib file name prefix is free to choose (e.g. `tags.taglib.xml`, `app.taglib.xml`, `myproject.taglib.xml`).

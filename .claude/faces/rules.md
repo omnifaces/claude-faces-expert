@@ -72,6 +72,7 @@ For minimal project configuration (web.xml, taglib, directory structure), see `.
 - NEVER omit the scope annotation; CDI defaults to `@Dependent`, which creates a new instance per EL evaluation -- this breaks virtually all backing bean use cases.
 - ALWAYS initialize initial state in `@PostConstruct` or in `AjaxBehavior` `listener` methods, not in fields, constructors or getters.
 - Getters MUST be pure (no business logic, no lazy-loading, no side effects); they are called multiple times per request by the Faces lifecycle.
+- Setters are ONLY needed for properties bound to `EditableValueHolder` components (e.g. `<h:inputText value="#{bean.foo}">`); read-only components (e.g. `<h:outputText>`, `<h:dataTable>`, `<f:selectItems>`) only call the getter, so no setter is needed.
 
 ## Scope Selection
 
@@ -118,6 +119,8 @@ For minimal project configuration (web.xml, taglib, directory structure), see `.
 - `UICommand` `actionListener` method signature: `void method(ActionEvent event)` or `void method()` in case event is unused.
 - `UICommand` `actionListener` should NEVER be used for business actions, it should only be used to prepare business action and determine whether to proceed or abort; use `action` for real business actions.
 - Any `AbortProcessingException` thrown during `actionListener` aborts `action`.
+- `immediate="true"` on `EditableValueHolder` is for prioritizing validation: immediate inputs validate during Apply Request Values phase; if any fails, non-immediate inputs in the same form are skipped entirely; real use case is a login form where the "password forgotten" button and the "username" field are both `immediate="true"` so the `required="true"` on the password field is skipped.
+- NEVER use `immediate="true"` on `UICommand` as a hack to skip validation in a form (e.g. cancel or logout button); use separate forms, or ajax with `execute="@this"` (default), or `UIOutcomeTarget` button for a simple page refresh instead.
 - NEVER use `binding` attribute for data binding. Use `value`.
 - NEVER use `binding` on a bean property; ONLY use `binding` on page variable when a component inside the view needs to reference another component inside the SAME view; real world example is "conditional requireness", e.g. `<h:inputText binding="#{uniquePageVariableName}">...<h:inputText required="#{not empty param[uniquePageVariableName.clientId]}">` whereby the second input field needs to be marked required when the first input field is filled.
 - AVOID generated IDs; when the component is a `NamingContainer`, `UIInput` or `UICommand`, ALWAYS set a fixed ID.
@@ -164,6 +167,10 @@ Top causes: component in different NamingContainer (use full client ID with `:`)
 When this project includes PrimeFaces, consult `.claude/faces/topics/primefaces.md` for PrimeFaces-specific rules.
 
 When this project includes OmniFaces, or the developer wants to simplify code, consult `.claude/faces/topics/omnifaces.md` for OmniFaces utilities that replace common boilerplate.
+
+## Examples
+
+For concrete code examples demonstrating these rules, see `.claude/faces/topics/examples.md`.
 
 ## References
 
