@@ -26,6 +26,8 @@ For detailed guidance on specific topics, read the relevant `.claude/faces/topic
 - **PSS** (Partial State Saving, since JSF 2.0): stores only the delta — efficient and the default.
 - **FSS** (Full State Saving): stores every component state including unchanged defaults — poor performance; discommended since JSF 2.0, deprecated since Faces 4.1, removal planned for Faces 6.0.
 
+For a detailed explanation of the request processing lifecycle, see `.claude/faces/topics/lifecycle.md`.
+
 ## XML Namespaces
 
 Jakarta Faces 4.0+ (Jakarta EE 10+):
@@ -101,6 +103,8 @@ For minimal project configuration (web.xml, taglib, directory structure), see `.
 - Once you need to parameterize a whole bean or a method call on include or tagfile, then better convert to composite component.
 - Once you need to bind a whole include/tagfile containing multiple `UIInput` and/or `UICommand` components to a single custom model like `<my:tag value="#{bean.customModel}">`, then better convert to composite component.
 
+For concrete code examples demonstrating all these page authoring rules, see `.claude/faces/topics/examples.md`.
+
 ## Resource Rules
 
 - ALWAYS put assets (scripts, styles, images, icons, fonts) in their own subfolder in `/WEB-INF/resources` and reference via `<h:outputScript name="...">`, `<h:outputStylesheet name="...">`, `<h:graphicImage name="...">`, `#{resource[name]}`.
@@ -167,10 +171,6 @@ Top causes: component in different NamingContainer (use full client ID with `:`)
 When this project includes PrimeFaces, consult `.claude/faces/topics/primefaces.md` for PrimeFaces-specific rules.
 
 When this project includes OmniFaces, or the developer wants to simplify code, consult `.claude/faces/topics/omnifaces.md` for OmniFaces utilities that replace common boilerplate.
-
-## Examples
-
-For concrete code examples demonstrating these rules, see `.claude/faces/topics/examples.md`.
 
 ## References
 
