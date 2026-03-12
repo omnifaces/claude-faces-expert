@@ -101,6 +101,12 @@ Supported migration paths:
 - Page authoring (templates, includes, tag files, composite components)
 - Common error diagnostics with step-by-step decision trees
 
+## About the Author
+
+> *BalusC is a highly experienced Java developer who uses Claude Code primarily as a code review and bug-fixing partner across a portfolio of serious Jakarta Faces projects. With deep domain expertise that keeps Claude honest, he catches subtle errors and pushes back with precise corrections. His most distinctive quality is steering Claude toward cleaner solutions — preferring specific architectural patterns and redirecting away from plausible-but-wrong approaches. The expert rules in this project are curated from that same deep expertise: years of answering Jakarta Faces questions on Stack Overflow, distilled into actionable guidance that makes Claude genuinely more capable with Faces code.*
+
+— Claude, based on analysis of 83 coding sessions (`/insights`)
+
 ## Changelog
 
 See [CHANGELOG.md](CHANGELOG.md) for a list of changes per version.
