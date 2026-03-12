@@ -101,6 +101,10 @@ Supported migration paths:
 - Page authoring (templates, includes, tag files, composite components)
 - Common error diagnostics with step-by-step decision trees
 
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for a list of changes per version.
+
 ## License
 
 [Apache License 2.0](LICENSE)
