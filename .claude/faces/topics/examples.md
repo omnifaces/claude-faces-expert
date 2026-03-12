@@ -237,9 +237,11 @@ Key points:
     </cc:interface>
 
     <cc:implementation>
-        <h:commandButton id="confirm" value="#{cc.attrs.value}" onclick="return confirm('#{cc.attrs.confirmMessage}')">
-            <f:ajax execute="@form" render="@form" />
-        </h:commandButton>
+        <span id="#{cc.clientId}">
+            <h:commandButton id="confirm" value="#{cc.attrs.value}" onclick="return confirm('#{cc.attrs.confirmMessage}')">
+                <f:ajax execute="@form" render="@form" />
+            </h:commandButton>
+        </span>
     </cc:implementation>
 </ui:component>
 ```
@@ -255,6 +257,7 @@ Key points:
 - Composite is in `WEB-INF/resources/components/` to prevent direct access to source.
 - Uses `<cc:actionSource>` with `targets` to expose the inner button's action to the client.
 - The composite is a `NamingContainer`; IDs inside are automatically scoped.
+- The `<span id="#{cc.clientId}">` (or `<div>` for block-level content) wrapper is a best practice to make the composite ajax-updatable by just its ID; without it, `render=":compositeId"` has no HTML element to update.
 - Registered via `<composite-library-name>components</composite-library-name>` in `tags.taglib.xml`.
 
 ## POST-Redirect-GET Navigation
