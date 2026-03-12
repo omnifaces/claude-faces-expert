@@ -16,15 +16,27 @@ Configuration/gotchas:
 - Max active view scopes configurable via context parameter (default 20).
 - For non-ajax download links, use `OmniFaces.Unload.disable()` or set the `download` attribute on the link to prevent unload event from firing.
 
-## SelectItemsConverter
+## Converters
 
-Use for any `UISelectOne`/`UISelectMany` with complex objects as values.
-Eliminates the need for a custom `@FacesConverter` that re-fetches entities from the database.
+OmniFaces provides several converters that fill gaps in the standard API.
 
-- Converter ID: `omnifaces.SelectItemsConverter` or tag `<o:selectItemsConverter />`.
-- Requires a good `toString()` implementation on the entity (must uniquely identify instances, e.g. `"Entity[id=123]"`).
-- Entity must also have proper `equals()` and `hashCode()`.
-- Alternative: `SelectItemsIndexConverter` converts by list position instead of `toString()`.
+- **`<o:selectItemsConverter>`** (`omnifaces.SelectItemsConverter`): use for any `UISelectOne`/`UISelectMany` with complex objects as values; eliminates the need for a custom `@FacesConverter` that re-fetches entities from the database. Requires a good `toString()` (must uniquely identify instances, e.g. `"Entity[id=123]"`) and proper `equals()`/`hashCode()`.
+- **`<o:selectItemsIndexConverter>`** (`omnifaces.SelectItemsIndexConverter`): alternative to `SelectItemsConverter` that converts by list position instead of `toString()`; use when `toString()` is not suitable as unique identifier.
+- **`<o:listConverter>`** (`omnifaces.ListConverter`): like `SelectItemsConverter` but works without `<f:selectItems>` — resolves values from a provided `List` attribute instead. Also requires `toString()`/`equals()`/`hashCode()`.
+- **`<o:listIndexConverter>`** (`omnifaces.ListIndexConverter`): position-based variant of `ListConverter`.
+- **`<o:genericEnumConverter>`** (`omnifaces.GenericEnumConverter`): automatically detects enum type in generic collections (e.g. `List<MyEnum>`); use on `UISelectMany` bound to enum collections where the standard `EnumConverter` fails because EL cannot resolve the generic type.
+- **`<o:implicitNumberConverter>`**: extends `<f:convertNumber>` to automatically drop/imply currency and percent symbols on `UIInput`; users type `100` instead of `$100` while the display still shows the formatted value.
+- **`<o:trimConverter>`** (`omnifaces.TrimConverter`): trims leading/trailing whitespace from submitted values.
+- **`<o:toLowerCaseConverter>`** (`omnifaces.ToLowerCaseConverter`): converts submitted values to lower case based on current locale.
+- **`<o:toUpperCaseConverter>`** (`omnifaces.ToUpperCaseConverter`): converts submitted values to upper case based on current locale.
+- **`<o:toCollectionConverter>`** (`omnifaces.ToCollectionConverter`): converts between delimited `String` and `Collection`; attributes: `delimiter` (split pattern), `collectionType` (FQCN of target collection), `itemConverter` (converter for individual items).
+- **`<o:compositeConverter>`**: chains multiple converters on a single component (standard Faces only allows one). `converterIds` attribute: comma-separated list of converter IDs. `getAsObject()` executes left-to-right; `getAsString()` executes in reverse order to maintain symmetry.
+  ```xml
+  <h:inputText value="#{bean.product}">
+      <o:compositeConverter converterIds="trimConverter,sanitizeConverter,productConverter" />
+  </h:inputText>
+  ```
+- **`ValueChangeConverter`**: abstract base class — extend and override `getAsChangedObject()` instead of `getAsObject()` to skip conversion when the submitted value hasn't changed; use for converters that perform expensive operations (e.g. database lookups) on `@ViewScoped` beans.
 
 ## FullAjaxExceptionHandler
 
@@ -142,41 +154,97 @@ Maps all `public static final` fields of a class/interface/enum into request sco
 - Since 4.6, enums support `#{EnumClass.members()}` to iterate over enum values.
 - Can be placed anywhere (unlike `<f:importConstants>` which requires `<f:metadata>`).
 
-## <o:validateBean>
+## Validators
 
-Enables bean validation control per component and class-level (cross-field) validation.
+### <o:validateBean>
 
-- Per-component: nest in `UICommand` or `UIForm` with `validationGroups` attribute.
-- Class-level validation: nest in `UIForm` with `value="#{bean}"` to validate the whole bean.
-- Supports `@jakarta.validation.Valid` for cascading validation on nested properties.
+ALWAYS prefer over `<f:validateWholeBean>` when OmniFaces is available.
+Enables per-component validation group control AND class-level (cross-field) bean validation with far more flexibility than the standard tags.
 
-## Multi-Field Validators
+Per-command / per-input — nest in `UICommand` or `UIInput` to control validation groups or disable validation for that component:
+```xml
+<h:commandButton value="Submit" action="#{bean.submit}">
+    <o:validateBean validationGroups="jakarta.validation.groups.Default,com.example.MyGroup" />
+</h:commandButton>
 
-Validate multiple related input fields together.
+<h:selectOneMenu value="#{bean.selectedItem}">
+    <f:selectItems value="#{bean.availableItems}" />
+    <o:validateBean disabled="true" />
+    <f:ajax execute="@form" listener="#{bean.itemChanged}" render="@form" />
+</h:selectOneMenu>
+```
 
-- **`<o:validateEqual>`**: all fields must have same value (e.g. password confirmation); usage: `<o:validateEqual components="password1 password2" />`.
-- **`<o:validateMultiple>`**: custom validator method or `MultiFieldValidator` bean; method signature: `boolean method(FacesContext, List<UIInput>, List<Object>)`; usage: `<o:validateMultiple components="foo bar baz" validator="#{bean.method}" />`.
-- `message` attribute to customize error message.
-- `components` attribute: space-separated component IDs.
+Class-level (cross-field) — nest in `UIForm` with `value="#{bean}"`. Can be placed anywhere inside the form (unlike `<f:validateWholeBean>` which must be the last child):
+```xml
+<h:inputText value="#{bean.product.item}" />
+<h:inputText value="#{bean.product.order}" />
+<o:validateBean value="#{bean.product}" showMessageFor="@violating" />
+```
+
+Cascading with `@Valid` (since OmniFaces 3.8) — validates the parent bean and cascades into annotated nested objects:
+```xml
+<o:validateBean value="#{bean}" />
+```
+```java
+@Valid
+private Product product;
+```
+
+Attributes:
+- **`value`**: the bean to validate at class level.
+- **`validationGroups`**: comma-separated validation groups to activate.
+- **`disabled`**: disables bean validation for the enclosing component.
+- **`method`**: `validateCopy` (default, validates on a copy) or `validateActual` (validates the actual bean during Update Model Values — use when the bean cannot be copied; trade-off: invalid values remain in the model, check `FacesContext.isValidationFailed()` in the action method).
+- **`copier`**: custom `org.omnifaces.util.copier.Copier` implementation. Default tries in order: `Cloneable` -> `Serializable` -> copy constructor -> no-arg constructor.
+- **`showMessageFor`**: `@form` (default), `@all`, `@global`, `@violating` (maps messages to the specific violating input components), or space-separated client IDs.
+- **`messageFormat`** (since OmniFaces 3.12): custom format string; `{0}` = error message, `{1}` = field labels.
+
+### <o:requiredCheckboxValidator>
+
+Fixes broken `required="true"` on `<h:selectBooleanCheckbox>` — standard Faces coerces unchecked to `Boolean.FALSE` before validation, so the required check always passes. Validator ID: `omnifaces.RequiredCheckboxValidator`. Message priority: `requiredMessage` attribute > custom message bundle > default `"{0}: a tick is required"`.
+
+### ValueChangeValidator
+
+Abstract base class — extend and override `validateChangedObject(FacesContext, UIComponent, T)` instead of `validate()` to skip validation when the submitted value hasn't changed. Use for validators that perform expensive operations (e.g. database uniqueness checks) on `@ViewScoped` beans. Companion to `ValueChangeConverter`.
+
+### Multi-Field Validators
+
+Validate multiple related input fields together. All share these common attributes:
+- `components`: space-separated component IDs of the `UIInput` fields to validate together.
+- `message`: custom error message; `{0}` is replaced with comma-separated field labels.
+- `showMessageFor`: `@this` (default, on the validator tag), `@all` (all referenced components), `@invalid` (only invalid ones), or specific client IDs.
+- `invalidateAll`: when `false`, marks only the actually-invalid fields instead of all referenced fields (default `true`).
+- `disabled`: EL expression to conditionally skip validation.
+
+Available validators:
+- **`<o:validateAll>`**: ALL fields must be filled out.
+- **`<o:validateAllOrNone>`**: either ALL fields are filled out, or NONE are.
+- **`<o:validateOne>`**: exactly ONE field must be filled out.
+- **`<o:validateOneOrMore>`**: at least ONE field must be filled out.
+- **`<o:validateOneOrNone>`**: at most ONE field may be filled out (zero is also OK).
+- **`<o:validateEqual>`**: all fields must have the same value (e.g. password confirmation).
+- **`<o:validateUnique>`**: all fields must have unique values (no duplicates).
+- **`<o:validateOrder>`**: field values must be in order; `type` attribute: `lt` (default, strictly ascending), `lte` (ascending, allows equal), `gt` (strictly descending), `gte` (descending, allows equal); values must implement `Comparable`.
+- **`<o:validateMultiple>`**: custom validator logic; specify a `validator` method or `MultiFieldValidator` bean; method signature: `boolean method(FacesContext, List<UIInput>, List<Object>)`; usage: `<o:validateMultiple components="foo bar baz" validator="#{bean.method}" />`.
 
 ## Utility Classes
 
 ### Faces (org.omnifaces.util.Faces)
 Flattens the Faces API hierarchy into static one-liners.
 Use instead of chaining `FacesContext.getCurrentInstance().getExternalContext().get...()`.
-Key methods: `getContext()`, `getApplication()`, `redirect()`, `sendFile()`, `getLocale()`, `isAjaxRequest()`, `getViewId()`, `navigate()`.
-API docs: https://omnifaces.org/docs/javadoc/5.1/org.omnifaces/org/omnifaces/util/Faces.html
+Key methods: `getContext()`, `redirect()`, `sendFile()`, `getLocale()`, `isAjaxRequest()`, `getViewId()`.
+API docs: https://omnifaces.org/docs/javadoc/current/org.omnifaces/org/omnifaces/util/Faces.html
 
 ### Messages (org.omnifaces.util.Messages)
 Convenience methods for Faces messages.
 Key methods: `addError()`, `addGlobalError()`, `addFlashGlobalInfo()`, `throwValidatorException()`.
 Builder pattern: `Messages.create().detail().error().add()`.
-API docs: https://omnifaces.org/docs/javadoc/5.1/org.omnifaces/org/omnifaces/util/Messages.html
+API docs: https://omnifaces.org/docs/javadoc/current/org.omnifaces/org/omnifaces/util/Messages.html
 
 ### Servlets (org.omnifaces.util.Servlets)
 Utility methods for servlet API, usable in filters/listeners without FacesContext.
 Key methods: `setCacheHeaders()`, `isFacesAjaxRequest()`, `isFacesResourceRequest()`, `facesRedirect()`.
-API docs: https://omnifaces.org/docs/javadoc/5.1/org.omnifaces/org/omnifaces/util/Servlets.html
+API docs: https://omnifaces.org/docs/javadoc/current/org.omnifaces/org/omnifaces/util/Servlets.html
 
 ## References
 

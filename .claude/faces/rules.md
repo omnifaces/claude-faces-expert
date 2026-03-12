@@ -13,7 +13,13 @@ For detailed guidance on specific topics, read the relevant `.claude/faces/topic
 - Use "Faces" when speaking generically; use "JSF" only when referring specifically to pre-4.0 versions.
 - The `javax.faces.` package applies to JSF 1.0-2.3 only; the `jakarta.faces.` package applies to Faces 3.0+.
 
-## View State
+## Life Cycle
+
+For a detailed explanation of the request processing lifecycle, see `.claude/faces/topics/lifecycle.md`.
+
+For detailed guidance on converters and validators, see `.claude/faces/topics/conversion-validation.md`.
+
+### View State
 
 - The component tree (UIViewRoot) is **rebuilt from scratch** from the XHTML/Facelets template on every request.
 - "View state" is the **delta** between the default component tree as built from the template and its actual state at the end of the previous Render Response phase.
@@ -26,9 +32,34 @@ For detailed guidance on specific topics, read the relevant `.claude/faces/topic
 - **PSS** (Partial State Saving, since JSF 2.0): stores only the delta — efficient and the default.
 - **FSS** (Full State Saving): stores every component state including unchanged defaults — poor performance; discommended since JSF 2.0, deprecated since Faces 4.1, removal planned for Faces 6.0.
 
-For a detailed explanation of the request processing lifecycle, see `.claude/faces/topics/lifecycle.md`.
+## CDI and Bean Management
 
-## XML Namespaces
+- ALWAYS use `@Named` + CDI scope annotations; NEVER use deprecated `javax.faces.bean` annotations which are removed in Faces 4.0.
+- CDI scopes: import from `jakarta.enterprise.context` (or `javax.enterprise.context` for pre-Jakarta).
+- `@ViewScoped`: import from `jakarta.faces.view` (NOT `jakarta.enterprise.context` which doesn't exist for ViewScoped, NOT deprecated `javax.faces.bean`).
+- NEVER omit the scope annotation; CDI defaults to `@Dependent`, which creates a new instance per EL evaluation -- this breaks virtually all backing bean use cases.
+- ALWAYS initialize initial state in `@PostConstruct` or in `AjaxBehavior` `listener` methods, not in fields, constructors or getters.
+- Getters MUST be pure (no business logic, no lazy-loading, no side effects); they are called multiple times per request by the Faces lifecycle.
+- Setters are ONLY needed for properties bound to `EditableValueHolder` components (e.g. `<h:inputText value="#{bean.foo}">`); read-only components (e.g. `<h:outputText>`, `<h:dataTable>`, `<f:selectItems>`) only call the getter, so no setter is needed.
+
+### Scope Selection
+
+- `@RequestScoped`: stored in `HttpServletRequest`; simple non-ajax forms, stateless pages; each postback creates a new instance.
+- `@ViewScoped`: stored in `HttpSession`; ajax forms, datatables, inline editing, wizards on a single view; the default choice for most ajax-enabled pages.
+- `@SessionScoped`: stored in `HttpSession`; login state, user preferences, shopping cart; avoid for large data.
+- `@ApplicationScoped`: stored in `ServletContext`; shared reference data, dropdown lists, caches; MUST be thread-safe.
+- `@ConversationScoped`: stored in `HttpSession`; developer-controlled interaction state (`conversation.begin()`, `conversation.end()`), usually callback links (e.g. external payment site); rarely needed.
+- `@FlowScoped`: stored in `HttpSession`; navigation-based interaction state, usually multi-page wizard (e.g. booking flow); rarely needed.
+- `@ClientWindowScoped`: stored in `HttpSession`; request parameter-based interaction state (basically, bookmarkable view state within the session); rarely needed.
+- If memory is a concern, use `@org.omnifaces.cdi.ViewScoped` from OmniFaces because it immediately destroys view state and bean instance during page unload instead of letting it accumulate and expire.
+- When scope is stored in `HttpSession`, bean MUST implement `Serializable`.
+- NOTE: `@ViewScoped` beans are NOT stored in "view state"; that's only the case when you use OmniFaces `@ViewScoped(saveInViewState=true)`.
+
+## Page Authoring
+
+For concrete code examples demonstrating all page authoring rules, see `.claude/faces/topics/examples.md`.
+
+### XML Namespaces
 
 Jakarta Faces 4.0+ (Jakarta EE 10+):
 ```xml
@@ -66,30 +97,7 @@ If the `faces-config.xml` exists and its version is outdated as compared to `pom
 
 For minimal project configuration (web.xml, taglib, directory structure), see `.claude/faces/topics/configuration.md`.
 
-## CDI and Bean Management
-
-- ALWAYS use `@Named` + CDI scope annotations; NEVER use deprecated `javax.faces.bean` annotations which are removed in Faces 4.0.
-- CDI scopes: import from `jakarta.enterprise.context` (or `javax.enterprise.context` for pre-Jakarta).
-- `@ViewScoped`: import from `jakarta.faces.view` (NOT `jakarta.enterprise.context` which doesn't exist for ViewScoped, NOT deprecated `javax.faces.bean`).
-- NEVER omit the scope annotation; CDI defaults to `@Dependent`, which creates a new instance per EL evaluation -- this breaks virtually all backing bean use cases.
-- ALWAYS initialize initial state in `@PostConstruct` or in `AjaxBehavior` `listener` methods, not in fields, constructors or getters.
-- Getters MUST be pure (no business logic, no lazy-loading, no side effects); they are called multiple times per request by the Faces lifecycle.
-- Setters are ONLY needed for properties bound to `EditableValueHolder` components (e.g. `<h:inputText value="#{bean.foo}">`); read-only components (e.g. `<h:outputText>`, `<h:dataTable>`, `<f:selectItems>`) only call the getter, so no setter is needed.
-
-## Scope Selection
-
-- `@RequestScoped`: stored in `HttpServletRequest`; simple non-ajax forms, stateless pages; each postback creates a new instance.
-- `@ViewScoped`: stored in `HttpSession`; ajax forms, datatables, inline editing, wizards on a single view; the default choice for most ajax-enabled pages.
-- `@SessionScoped`: stored in `HttpSession`; login state, user preferences, shopping cart; avoid for large data.
-- `@ApplicationScoped`: stored in `ServletContext`; shared reference data, dropdown lists, caches; MUST be thread-safe.
-- `@ConversationScoped`: stored in `HttpSession`; developer-controlled interaction state (`conversation.begin()`, `conversation.end()`), usually callback links (e.g. external payment site); rarely needed.
-- `@FlowScoped`: stored in `HttpSession`; navigation-based interaction state, usually multi-page wizard (e.g. booking flow); rarely needed.
-- `@ClientWindowScoped`: stored in `HttpSession`; request parameter-based interaction state (basically, bookmarkable view state within the session); rarely needed.
-- If memory is a concern, use `@org.omnifaces.cdi.ViewScoped` from OmniFaces because it immediately destroys view state and bean instance during page unload instead of letting it accumulate and expire.
-- When scope is stored in `HttpSession`, bean MUST implement `Serializable`.
-- NOTE: `@ViewScoped` beans are NOT stored in "view state"; that's only the case when you use OmniFaces `@ViewScoped(saveInViewState=true)`.
-
-## Page Authoring Rules
+### Facelets Rules
 
 - NEVER wrap the entire page in a single "god form"; use multiple smaller `UIForm` elements scoped to logical sections (e.g. search form, edit form, filter panel); a single form causes the entire component tree to be processed on every submit; components in one form can reference components in another form for `render`/`update` using absolute IDs (`:otherFormId:componentId`), but not for `execute`/`process`.
 - ALWAYS use HTML5 doctype directly `<!DOCTYPE html>`, NEVER use XHTML doctype.
@@ -103,14 +111,12 @@ For minimal project configuration (web.xml, taglib, directory structure), see `.
 - Once you need to parameterize a whole bean or a method call on include or tagfile, then better convert to composite component.
 - Once you need to bind a whole include/tagfile containing multiple `UIInput` and/or `UICommand` components to a single custom model like `<my:tag value="#{bean.customModel}">`, then better convert to composite component.
 
-For concrete code examples demonstrating all these page authoring rules, see `.claude/faces/topics/examples.md`.
-
-## Resource Rules
+### Resource Rules
 
 - ALWAYS put assets (scripts, styles, images, icons, fonts) in their own subfolder in `/WEB-INF/resources` and reference via `<h:outputScript name="...">`, `<h:outputStylesheet name="...">`, `<h:graphicImage name="...">`, `#{resource[name]}`.
 - NEVER use inline styles; ALWAYS either put it in a separate CSS file or use an existing CSS framework such as Bootstrap, PrimeFlex, Tailwind, etc; in case project has no such CSS framework, ALWAYS ask the developer first which one to pick.
 
-## Component Rules
+### Component Rules
 
 - `UIInput` and `UICommand` components, and `ClientBehaviorHolder` components having `AjaxBehavior` MUST be inside `UIForm`; plain HTML `<form>` works only for GET forms with `<f:viewParam>`.
 - NEVER nest `UIForm` components; HTML does not allow nested forms in first place.
@@ -135,7 +141,7 @@ For concrete code examples demonstrating all these page authoring rules, see `.c
 - NEVER manipulate the component tree programmatically when `rendered` attribute or even when building component tree with JSTL tags suffices.
 - NEVER use unmodifiable/internal collections (`List.of()`, `Arrays.asList()`, `Stream.toList()`) as backing value for `UISelectMany` components; use `new ArrayList`, `Stream.collect(Collectors.toCollection(ArrayList::new))` etc.
 
-## Ajax Rules
+### Ajax Rules
 
 - `<f:ajax execute="...">` / `<p:ajax process="...">`: controls which components are processed server-side.
 - `<f:ajax render="...">` / `<p:ajax update="...">`: controls which components are re-rendered.

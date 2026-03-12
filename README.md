@@ -18,6 +18,7 @@ Curated by [BalusC](https://balusc.org) based on his Stack Overflow answers to f
 | `.claude/faces/topics/primefaces.md` | PrimeFaces-specific rules and gotchas |
 | `.claude/faces/topics/omnifaces.md` | OmniFaces utilities: when and how to use them |
 | `.claude/faces/topics/lifecycle.md` | Request processing lifecycle: phases, shortcuts, ajax, PhaseListener |
+| `.claude/faces/topics/conversion-validation.md` | Converters, validators, Bean Validation integration, custom converters/validators |
 | `.claude/faces/topics/examples.md` | Concrete code examples demonstrating best practices |
 | `.claude/skills/faces-review/SKILL.md` | `/faces-review` slash command for reviewing Faces code |
 | `.claude/skills/faces-migrate/SKILL.md` | `/faces-migrate` slash command for migrating between Faces versions |
