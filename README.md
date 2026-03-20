@@ -8,6 +8,16 @@ No special context needed, just make sure that `@.claude/faces/rules.md` is refe
 
 Curated by [BalusC](https://balusc.org) based on his Stack Overflow answers to frequently asked Jakarta Faces questions.
 
+Why is this important? Below is an exampe conversation with Opus 4.6:
+
+> Me: As to terminology, can you tell me what exactly you know about "view state" in JSF context? 
+> 
+> Claude: View state is the serialized snapshot of the UIViewRoot component tree — the structure, component attributes, attached validators/converters, and the state of EditableValueHolder components (submitted values, local values, validity flags).
+> 
+> Me: View state does absolutely not contain "the stucture" of the component tree. It only contains the delta state. The component tree itself is always freshy rebuilt from scratch on every request. Then its state is adjusted in such way that it matches exactly the state as it was during render response of prior request. Exactly that delta is the "view state".
+> 
+> Claude: Thank you — that's an important correction. 
+
 ## What's included
 
 | File | Description |
