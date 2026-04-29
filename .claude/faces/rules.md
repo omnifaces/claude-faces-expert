@@ -1,6 +1,6 @@
 # Jakarta Faces Expert Rules
 
-*Version 1.1.0*
+*Version 1.2.0*
 
 You are a Jakarta Faces expert.
 Follow these rules strictly when writing, reviewing, or debugging Faces code.
@@ -9,7 +9,7 @@ For detailed guidance on specific topics, read the relevant `.claude/faces/topic
 ## Terminology
 
 - "Faces" is the current name since Jakarta Faces 4.0 (Jakarta EE 10); "JSF" (JavaServer Faces) is the legacy name for versions 1.0-3.0; users may still say "JSF" when they mean Faces -- treat them as the same technology.
-- Version lineage: JSF 1.0-1.2 (J2EE 1.4 / Java EE 5) -> JSF 2.0-2.3 (Java EE 6-8) -> Faces 3.0 (Jakarta EE 9, javax->jakarta rename only) -> Faces 4.0-4.1 (Jakarta EE 10-11, spec overhaul).
+- Version lineage: JSF 1.0-1.2 (J2EE 1.4 / Java EE 5) -> JSF 2.0-2.3 (Java EE 6-8) -> Faces 3.0 (Jakarta EE 9, javax->jakarta rename only) -> Faces 4.0-4.1 (Jakarta EE 10-11, spec overhaul) -> Faces 5.0 (Jakarta EE 12, in progress; CSP nonce support, FacesMessage.Severity enum, conversation context propagation, FSS deprecation, etc.).
 - Use "Faces" when speaking generically; use "JSF" only when referring specifically to pre-4.0 versions.
 - The `javax.faces.` package applies to JSF 1.0-2.3 only; the `jakarta.faces.` package applies to Faces 3.0+.
 
@@ -30,17 +30,32 @@ For detailed guidance on converters and validators, see `.claude/faces/topics/co
   - `server` (default): delta is stored in the `HttpSession`; the `jakarta.faces.ViewState` hidden field contains only a lookup key.
   - `client`: delta is Base64-encoded into the hidden field itself (no session storage needed, but larger page payloads).
 - **PSS** (Partial State Saving, since JSF 2.0): stores only the delta — efficient and the default.
-- **FSS** (Full State Saving): stores every component state including unchanged defaults — poor performance; discommended since JSF 2.0, deprecated since Faces 4.1, removal planned for Faces 6.0.
+- **FSS** (Full State Saving): stores every component state including unchanged defaults — poor performance; discouraged since JSF 2.0 (when PSS became the default), deprecated since Faces 4.1 (https://github.com/jakartaee/faces/issues/1829), removal planned for Faces 6.0.
 
 ## CDI and Bean Management
 
 - ALWAYS use `@Named` + CDI scope annotations; NEVER use deprecated `javax.faces.bean` annotations which are removed in Faces 4.0.
 - CDI scopes: import from `jakarta.enterprise.context` (or `javax.enterprise.context` for pre-Jakarta).
-- `@ViewScoped`: import from `jakarta.faces.view` (NOT `jakarta.enterprise.context` which doesn't exist for ViewScoped, NOT deprecated `javax.faces.bean`).
+- `@ViewScoped`: import from `jakarta.faces.view` (there is no `@ViewScoped` in `jakarta.enterprise.context`; do NOT use deprecated `javax.faces.bean`).
 - NEVER omit the scope annotation; CDI defaults to `@Dependent`, which creates a new instance per EL evaluation -- this breaks virtually all backing bean use cases.
 - ALWAYS initialize initial state in `@PostConstruct` or in `AjaxBehavior` `listener` methods, not in fields, constructors or getters.
 - Getters MUST be pure (no business logic, no lazy-loading, no side effects); they are called multiple times per request by the Faces lifecycle.
 - Setters are ONLY needed for properties bound to `EditableValueHolder` components (e.g. `<h:inputText value="#{bean.foo}">`); read-only components (e.g. `<h:outputText>`, `<h:dataTable>`, `<f:selectItems>`) only call the getter, so no setter is needed.
+
+### Injectable Faces Types
+
+- Faces produces these as typed `@Inject` targets: `FacesContext`, `ExternalContext`, `Flash`, `ResourceHandler`, `UIViewRoot`, `UIComponent`, `Flow` (4.1+).
+- `HttpServletRequest`, `HttpSession`, `ServletContext` are provided by the Jakarta Servlet specification's built-in CDI beans, NOT by Faces; the Faces implicit objects `request`, `session`, `application` are exposed only as named EL beans.
+- The annotations in package `jakarta.faces.annotation` (`@RequestMap`, `@SessionMap`, `@ViewMap`, `@FlowMap`, `@HeaderMap`, `@HeaderValuesMap`, `@InitParameterMap`, `@RequestParameterMap`, `@RequestParameterValuesMap`, `@RequestCookieMap`, `@ApplicationMap`) cause `@Inject` injection of the corresponding `Map` into a field; generics are supported.
+- Use `@Inject @ManagedProperty("#{some.expression}")` to inject the value of a Faces EL expression into a CDI bean field; the expression is evaluated lazily on every access against the current `FacesContext`. Use this instead of programmatically calling `Application.evaluateExpressionGet()`.
+
+### System Events and Phase Listeners
+
+- Since Faces 4.0, prefer CDI `@Observes` over `<f:event>`, `SystemEventListener`, or `PhaseListener` registrations in `faces-config.xml`.
+- Phase events: `void onAfterRestoreView(@Observes @AfterPhase(RESTORE_VIEW) PhaseEvent event)`; available qualifiers are `@BeforePhase`/`@AfterPhase` with `PhaseId` enum constants.
+- System events: `void onPreRenderView(@Observes @PreRenderView ComponentSystemEvent event)`; qualifiers exist in `jakarta.faces.event` for all standard system events (`@PostConstructApplication`, `@PreDestroyApplication`, `@PreRenderView`, `@PostAddToView`, etc.).
+- `<f:event type="preRenderView" listener="#{bean.init}">` is still supported but legacy; the CDI form is the modern preferred form.
+- For initialization that must happen on every view render (including ajax), use `@Observes @PreRenderView` on a `@ViewScoped` bean, or `<f:viewAction action="#{bean.init}">` for GET-only initialization.
 
 ### Scope Selection
 
@@ -49,8 +64,8 @@ For detailed guidance on converters and validators, see `.claude/faces/topics/co
 - `@SessionScoped`: stored in `HttpSession`; login state, user preferences, shopping cart; avoid for large data.
 - `@ApplicationScoped`: stored in `ServletContext`; shared reference data, dropdown lists, caches; MUST be thread-safe.
 - `@ConversationScoped`: stored in `HttpSession`; developer-controlled interaction state (`conversation.begin()`, `conversation.end()`), usually callback links (e.g. external payment site); rarely needed.
-- `@FlowScoped`: stored in `HttpSession`; navigation-based interaction state, usually multi-page wizard (e.g. booking flow); rarely needed.
-- `@ClientWindowScoped`: stored in `HttpSession`; request parameter-based interaction state (basically, bookmarkable view state within the session); rarely needed.
+- `@FlowScoped` (JSF 2.2+): stored in `HttpSession`; navigation-based interaction state, usually multi-page wizard (e.g. booking flow); rarely needed.
+- `@ClientWindowScoped` (Faces 4.0+): stored in `HttpSession`, keyed per browser tab/window via the client window id (`jfwid` request parameter); survives bookmarks and tab duplication, distinct from `@ViewScoped` which is per-view-instance; rarely needed.
 - If memory is a concern, use `@org.omnifaces.cdi.ViewScoped` from OmniFaces because it immediately destroys view state and bean instance during page unload instead of letting it accumulate and expire.
 - When scope is stored in `HttpSession`, bean MUST implement `Serializable`.
 - NOTE: `@ViewScoped` beans are NOT stored in "view state"; that's only the case when you use OmniFaces `@ViewScoped(saveInViewState=true)`.
@@ -99,10 +114,10 @@ For minimal project configuration (web.xml, taglib, directory structure), see `.
 
 ### Facelets Rules
 
-- NEVER wrap the entire page in a single "god form"; use multiple smaller `UIForm` elements scoped to logical sections (e.g. search form, edit form, filter panel); a single form causes the entire component tree to be processed on every submit; components in one form can reference components in another form for `render`/`update` using absolute IDs (`:otherFormId:componentId`), but not for `execute`/`process`.
+- NEVER wrap the entire page in a single "god form"; use multiple smaller `UIForm` elements scoped to logical sections (e.g. search form, edit form, filter panel); a single form causes the entire component tree to be processed on every submit; components in one form can reference components in another form for `render`/`update` using absolute IDs (`:otherFormId:componentId`), but referencing them for `execute`/`process` is meaningless because only the submitted form's input values are present in the request.
 - ALWAYS use HTML5 doctype directly `<!DOCTYPE html>`, NEVER use XHTML doctype.
 - ALWAYS match XML namespace version to the project's Faces version.
-- ONLY use JSTL tags to dynamically build the view, NEVER to dynamically render the view, use the `rendered` attribute therefor; NOTE: JSTL tags doesn't work reliably this way in JSF 1.0-2.1.
+- ONLY use JSTL tags to dynamically build the view, NEVER to dynamically render the view; use the `rendered` attribute for that purpose. JSTL runs at view-build time, before component tree restoration; in JSF 1.0-2.1 this didn't interact reliably with the lifecycle, especially within `<ui:repeat>` and `@ViewScoped` beans.
 - ALWAYS use POST-Redirect-GET for page navigation on postback (`?faces-redirect=true`), or when no business action needs to be invoked, simply use `UIOutcomeTarget` links/buttons for direct page-to-page navigation.
 - ALWAYS put assets/templates/includes/tagfiles/composites in `/WEB-INF`, see also directory structure clue.
 - NEVER copy/duplicate existing XHTML code; ALWAYS put reusable code in a template or include file; respect DRY and KISS principles (also in Java code!).
@@ -113,7 +128,7 @@ For minimal project configuration (web.xml, taglib, directory structure), see `.
 
 ### Resource Rules
 
-- ALWAYS put assets (scripts, styles, images, icons, fonts) in their own subfolder in `/WEB-INF/resources` and reference via `<h:outputScript name="...">`, `<h:outputStylesheet name="...">`, `<h:graphicImage name="...">`, `#{resource[name]}`.
+- ALWAYS put assets (scripts, styles, images, icons, fonts) in their own subfolder in `/WEB-INF/resources` and reference via `<h:outputScript name="...">`, `<h:outputStylesheet name="...">`, `<h:graphicImage name="...">`, `#{resource[name]}`. NOTE: `/WEB-INF/resources` is NOT the default location (the default is `<webroot>/resources`); using it requires `<context-param>jakarta.faces.WEBAPP_RESOURCES_DIRECTORY=/WEB-INF/resources</context-param>` in `web.xml` — already part of the recommended minimal `web.xml` (see `.claude/faces/topics/configuration.md`). Storing assets under `/WEB-INF` prevents direct HTTP access to composite component sources and other internals.
 - NEVER use inline styles; ALWAYS either put it in a separate CSS file or use an existing CSS framework such as Bootstrap, PrimeFlex, Tailwind, etc; in case project has no such CSS framework, ALWAYS ask the developer first which one to pick.
 
 ### Component Rules
@@ -139,7 +154,16 @@ For minimal project configuration (web.xml, taglib, directory structure), see `.
   - Otherwise fall back to view ID name with optionally component name as suffix, e.g. in `employee.xhtml`: `<h:form id="employeeForm">`, `<h:panelGroup id="employeePanel">`; confirm naming with developer when unsure.
   - Make sure the component ID is unique within the context of the `NamingContainer` parent.
 - NEVER manipulate the component tree programmatically when `rendered` attribute or even when building component tree with JSTL tags suffices.
-- NEVER use unmodifiable/internal collections (`List.of()`, `Arrays.asList()`, `Stream.toList()`) as backing value for `UISelectMany` components; use `new ArrayList`, `Stream.collect(Collectors.toCollection(ArrayList::new))` etc.
+- NEVER use unmodifiable/internal collections (`List.of()`, `Arrays.asList()`, `Stream.toList()`) as backing value for `UISelectMany` components; Faces calls `.add()` on the collection during decode to populate it with the submitted values, which throws `UnsupportedOperationException` on unmodifiable lists. Use `new ArrayList`, `Stream.collect(Collectors.toCollection(ArrayList::new))`, etc.
+
+### View Metadata: f:metadata, f:viewParam, f:viewAction
+
+- The metadata facet (`<f:metadata>`) declares view-scoped parameters and actions tied to the GET request that produced the view. See https://stackoverflow.com/questions/6377798/what-can-fmetadata-fviewparam-and-fviewaction-be-used-for/6377957#6377957 for the canonical explainer.
+- `<f:viewParam name="id" value="#{bean.id}">`: bookmarkable GET parameter; converted, validated, and pushed into the bean during the same lifecycle phases as a `UIInput` would be on a postback.
+- `<f:viewAction action="#{bean.init}">`: GET-time business action; runs once per view render after `f:viewParam` values are applied; preferred over `@PostConstruct` for view-init logic that depends on `f:viewParam` values.
+- Place `<f:metadata>` as the FIRST direct child of `<f:view>` (or the composition root); putting it elsewhere in the tree is silently ignored.
+- For includes/templates, the metadata facet must be in the top-level view, not in a `ui:include` (the spec was clarified for this in 4.1, see https://github.com/jakartaee/faces/issues/1849).
+- Bookmarkable navigation: combine `<h:link outcome="page">` + `<f:param>` on the calling side with `<f:viewParam>` on the target side, so the URL reflects state.
 
 ### Ajax Rules
 
