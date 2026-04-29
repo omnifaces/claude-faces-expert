@@ -1,6 +1,6 @@
 # Examples
 
-*Version 1.1.0*
+*Version 1.2.1*
 
 Concrete code examples demonstrating best practices from the rules.
 All examples use Faces 4.0+ namespaces.
@@ -259,6 +259,111 @@ Key points:
 - The composite is a `NamingContainer`; IDs inside are automatically scoped.
 - The `<span id="#{cc.clientId}">` (or `<div>` for block-level content) wrapper is a best practice to make the composite ajax-updatable by just its ID; without it, `render=":compositeId"` has no HTML element to update.
 - Registered via `<composite-library-name>components</composite-library-name>` in `tags.taglib.xml`.
+
+## GET Search Form (f:metadata, f:viewParam, f:viewAction)
+
+`employees.xhtml`:
+```xml
+<ui:composition template="/WEB-INF/templates/layout.xhtml"
+    xmlns:ui="jakarta.faces.facelets"
+    xmlns:h="jakarta.faces.html"
+    xmlns:f="jakarta.faces.core"
+>
+    <ui:param name="title" value="Search Employees" />
+
+    <f:metadata>
+        <f:viewParam name="query" value="#{employeesSearchBacking.query}" />
+        <f:viewParam name="department" value="#{employeesSearchBacking.department}" />
+        <f:viewAction action="#{employeesSearchBacking.search}" />
+    </f:metadata>
+
+    <ui:define name="content">
+        <!-- GET search form: plain HTML <form>, NOT <h:form>. -->
+        <!-- Input names must match the <f:viewParam> names so the bookmarkable URL is "?query=...&department=...". -->
+        <form>
+            <label for="query">Search:</label>
+            <input id="query" name="query" type="text" value="#{employeesSearchBacking.query}" />
+
+            <label for="department">Department:</label>
+            <select id="department" name="department">
+                <option value="">All</option>
+                <ui:repeat value="#{employeesSearchBacking.departments}" var="department">
+                    <option value="#{department}" selected="#{department eq employeesSearchBacking.department ? 'selected' : null}">#{department}</option>
+                </ui:repeat>
+            </select>
+
+            <button type="submit">Search</button>
+        </form>
+
+        <h:dataTable value="#{employeesSearchBacking.results}" var="employee" rendered="#{not empty employeesSearchBacking.results}">
+            <h:column>
+                <f:facet name="header">Name</f:facet>
+                #{employee.name}
+            </h:column>
+            <h:column>
+                <f:facet name="header">Department</f:facet>
+                #{employee.department}
+            </h:column>
+        </h:dataTable>
+
+        <h:outputText value="No results." rendered="#{employeesSearchBacking.searched and empty employeesSearchBacking.results}" />
+    </ui:define>
+</ui:composition>
+```
+
+`EmployeesSearchBacking.java`:
+```java
+import java.util.List;
+
+import jakarta.annotation.PostConstruct;
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+
+@Named
+@RequestScoped
+public class EmployeesSearchBacking {
+
+    @Inject
+    private EmployeeService employeeService;
+
+    private String query;
+    private String department;
+    private List<String> departments;
+    private List<Employee> results;
+    private boolean searched;
+
+    @PostConstruct
+    public void init() {
+        departments = employeeService.listDepartments();
+    }
+
+    public void search() {
+        if (query != null || department != null) {
+            results = employeeService.search(query, department);
+            searched = true;
+        }
+    }
+
+    public String getQuery() { return query; }
+    public void setQuery(String query) { this.query = query; }
+    public String getDepartment() { return department; }
+    public void setDepartment(String department) { this.department = department; }
+    public List<String> getDepartments() { return departments; }
+    public List<Employee> getResults() { return results; }
+    public boolean isSearched() { return searched; }
+}
+```
+
+Key points:
+- `<f:metadata>` is the FIRST direct child of the composition root (template client), not inside the master template.
+- `<f:viewParam>` extracts each query string parameter, converts/validates it, and pushes it into the bean during Apply Request Values, Process Validations, and Update Model Values — exactly like a `UIInput` on a postback.
+- `<f:viewAction>` invokes `search()` during Invoke Application, AFTER the `<f:viewParam>` values are applied — so `query` and `department` are already populated; `@PostConstruct` would run too early for this.
+- This is a GET form, so it MUST be a plain HTML `<form>`, NOT `<h:form>` (which is POST). UIInput components inside a non-UIForm container would render with client IDs that do not match the `<f:viewParam>` names; using plain `<input name="...">` keeps the URL clean and bookmarkable.
+- `value="#{employeesSearchBacking.query}"` on the plain inputs preserves the previous search terms when the page is reloaded with the same URL.
+- The result URL `?query=foo&department=Sales` is bookmarkable, shareable, and reproducible.
+- Caveat: this GET request runs the FULL lifecycle (not just Restore View + Render Response), since `<f:viewParam>` and `<f:viewAction>` are present.
+- Bean is `@RequestScoped`: there is no `<h:form>` (no postback), so view-scope state is not needed; each search is a fresh GET request that re-applies the bookmarkable parameters and re-runs `<f:viewAction>`. No `Serializable` needed either.
 
 ## POST-Redirect-GET Navigation
 

@@ -6,7 +6,7 @@ argument-hint: "[target version, e.g. 4.1]"
 allowed-tools: Read, Edit, Glob, Grep, Bash, Agent
 ---
 
-*Version 1.1.0*
+*Version 1.2.1*
 
 Migrate the current project to Jakarta Faces `$ARGUMENTS` (if no argument, ask the developer for the target version).
 

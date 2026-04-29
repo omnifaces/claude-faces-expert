@@ -1,6 +1,6 @@
 # Faces Lifecycle
 
-*Version 1.1.0*
+*Version 1.2.1*
 
 The Faces request processing lifecycle defines the order in which the server processes a Faces HTTP request.
 Understanding this lifecycle is essential for knowing when things happen and why certain rules exist.
@@ -15,9 +15,9 @@ Every Faces request passes through up to 6 phases in this order:
   - Any attribute of a Facelets template tag (e.g. `<ui:include>`, `<ui:repeat>`) and JSTL core tag (e.g. `<c:if>`, `<c:forEach>`).
   - Only the `id` and `binding` attributes of Faces components; all other component attributes are NOT evaluated during view build.
 - On postback, the view state delta from the previous response is applied to restore the tree to its previous state.
-- On initial (non-postback/GET) request, an empty view is created and the lifecycle skips directly to Render Response.
+- On initial (non-postback/GET) request, an empty view is created; if the view has NO `<f:viewParam>` and NO `<f:viewAction>` in its `<f:metadata>`, the lifecycle skips directly to Render Response. Otherwise (at least one `<f:viewParam>` and/or `<f:viewAction>` is present), the request continues through ALL phases.
 - `@PostConstruct` on backing beans is called when the bean is first referenced during this phase (or any later phase).
-- `<f:viewAction>` is executed after this phase (before Apply Request Values) on initial requests, or after Invoke Application on postbacks if `onPostback="true"`.
+- `<f:viewAction>` is invoked during Invoke Application (phase 5), AFTER `<f:viewParam>` values have been applied in Update Model Values; on initial GET requests by default, also on postbacks if `onPostback="true"`.
 
 ### 2. Apply Request Values
 - Input and command components first get model values from the backing bean to evaluate `rendered`, `disabled`, and `readonly` attributes, to determine whether to process the request.
@@ -54,7 +54,8 @@ Every Faces request passes through up to 6 phases in this order:
 ## Phase Shortcuts
 
 The lifecycle can be short-circuited:
-- **Initial (GET) request**: only Restore View and Render Response execute; phases 2-5 are skipped.
+- **Initial (GET) request without `<f:viewParam>` or `<f:viewAction>`**: only Restore View and Render Response execute; phases 2-5 are skipped.
+- **Initial (GET) request WITH at least one `<f:viewParam>` and/or `<f:viewAction>`**: NO shortcut — the request goes through the ENTIRE lifecycle (Restore View -> Apply Request Values -> Process Validations -> Update Model Values -> Invoke Application -> Render Response). `<f:viewParam>` values are extracted from the query string and converted/validated/applied like a `UIInput` on a postback; `<f:viewAction>` is invoked during Invoke Application.
 - **Validation/conversion failure**: skips from Process Validations directly to Render Response; setters and actions are never called.
 - **`immediate="true"` on UICommand**: action executes during Apply Request Values; non-immediate inputs are not processed at all.
 - **`FacesContext.renderResponse()`**: called programmatically to skip remaining phases and jump to Render Response.

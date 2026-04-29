@@ -1,6 +1,6 @@
 # Jakarta Faces Expert Rules
 
-*Version 1.2.0*
+*Version 1.2.1*
 
 You are a Jakarta Faces expert.
 Follow these rules strictly when writing, reviewing, or debugging Faces code.
@@ -59,7 +59,7 @@ For detailed guidance on converters and validators, see `.claude/faces/topics/co
 
 ### Scope Selection
 
-- `@RequestScoped`: stored in `HttpServletRequest`; simple non-ajax forms, stateless pages; each postback creates a new instance.
+- `@RequestScoped`: stored in `HttpServletRequest`; simple non-ajax forms, stateless pages, GET-only pages backed by `<f:viewParam>`/`<f:viewAction>` (search/filter/detail views with bookmarkable URLs and no `<h:form>` postback); each request creates a new instance, so no `Serializable` is needed.
 - `@ViewScoped`: stored in `HttpSession`; ajax forms, datatables, inline editing, wizards on a single view; the default choice for most ajax-enabled pages.
 - `@SessionScoped`: stored in `HttpSession`; login state, user preferences, shopping cart; avoid for large data.
 - `@ApplicationScoped`: stored in `ServletContext`; shared reference data, dropdown lists, caches; MUST be thread-safe.
@@ -158,12 +158,14 @@ For minimal project configuration (web.xml, taglib, directory structure), see `.
 
 ### View Metadata: f:metadata, f:viewParam, f:viewAction
 
-- The metadata facet (`<f:metadata>`) declares view-scoped parameters and actions tied to the GET request that produced the view. See https://stackoverflow.com/questions/6377798/what-can-fmetadata-fviewparam-and-fviewaction-be-used-for/6377957#6377957 for the canonical explainer.
-- `<f:viewParam name="id" value="#{bean.id}">`: bookmarkable GET parameter; converted, validated, and pushed into the bean during the same lifecycle phases as a `UIInput` would be on a postback.
-- `<f:viewAction action="#{bean.init}">`: GET-time business action; runs once per view render after `f:viewParam` values are applied; preferred over `@PostConstruct` for view-init logic that depends on `f:viewParam` values.
-- Place `<f:metadata>` as the FIRST direct child of `<f:view>` (or the composition root); putting it elsewhere in the tree is silently ignored.
-- For includes/templates, the metadata facet must be in the top-level view, not in a `ui:include` (the spec was clarified for this in 4.1, see https://github.com/jakartaee/faces/issues/1849).
-- Bookmarkable navigation: combine `<h:link outcome="page">` + `<f:param>` on the calling side with `<f:viewParam>` on the target side, so the URL reflects state.
+- `<f:metadata>` declares view-scoped parameters and actions tied to the GET request that produced the view. A GET request with at least one `<f:viewParam>` and/or `<f:viewAction>` goes through the ENTIRE lifecycle (Apply Request Values through Invoke Application), not just Restore View + Render Response — see `.claude/faces/topics/lifecycle.md`.
+- `<f:viewParam name="id" value="#{bean.id}">`: declares a bookmarkable GET request parameter; the parameter value is extracted from the query string, converted, validated, and pushed into the model during the SAME lifecycle phases as a `UIInput` on a postback (Apply Request Values, Process Validations, Update Model Values). Supports `converter`, `validator`, `required`, `requiredMessage`, etc., exactly like `<h:inputText>`.
+- `<f:viewAction action="#{bean.init}">`: declares a GET-time business action; invoked during Invoke Application after `<f:viewParam>` values have been applied to the model. Use this instead of `@PostConstruct` whenever the init logic depends on `<f:viewParam>` values, since `@PostConstruct` runs before they are applied. By default runs only on initial GET requests; set `onPostback="true"` to also run on postbacks. Can return a navigation outcome (e.g. `"/error?faces-redirect=true"`) to short-circuit the page (e.g. when the requested entity does not exist or the user lacks permission).
+- Place `<f:metadata>` as the FIRST direct child of `<f:view>` (or the composition root of a templated client); placing it elsewhere in the tree, or inside a `<ui:include>`, is silently ignored. For templated pages, define `<f:metadata>` directly in the template client (top-level view), not in the master template (the spec clarified this in Faces 4.1, see https://github.com/jakartaee/faces/issues/1849).
+- Bookmarkable navigation: combine `<h:link outcome="page">` + `<f:param>` on the calling side with `<f:viewParam>` on the target side, so the URL reflects state and the page is reloadable/shareable.
+- Common use cases: GET-based search/filter pages where filters are query parameters; entity detail pages keyed by an `id` parameter; pre-fetching data based on query params; validating GET parameters before render; converting `?id=foo` into a typed model property; redirecting to a 404/error page when the requested entity does not exist or the user lacks permission.
+- Implication for backing beans: when a GET request runs the full lifecycle, getters that participate in `rendered`/`disabled`/`readonly` evaluation are invoked during Apply Request Values too; respect the "getters must be pure" rule consistently.
+- For a concrete GET search form example using `<f:metadata>` + `<f:viewParam>` + `<f:viewAction>`, see `.claude/faces/topics/examples.md`.
 
 ### Ajax Rules
 
