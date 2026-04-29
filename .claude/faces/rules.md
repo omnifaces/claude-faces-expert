@@ -9,7 +9,7 @@ For detailed guidance on specific topics, read the relevant `.claude/faces/topic
 ## Terminology
 
 - "Faces" is the current name since Jakarta Faces 4.0 (Jakarta EE 10); "JSF" (JavaServer Faces) is the legacy name for versions 1.0-3.0; users may still say "JSF" when they mean Faces -- treat them as the same technology.
-- Version lineage: JSF 1.0-1.2 (J2EE 1.4 / Java EE 5) -> JSF 2.0-2.3 (Java EE 6-8) -> Faces 3.0 (Jakarta EE 9, javax->jakarta rename only) -> Faces 4.0-4.1 (Jakarta EE 10-11, spec overhaul) -> Faces 5.0 (Jakarta EE 12, in progress; CSP nonce support, FacesMessage.Severity enum, conversation context propagation, FSS deprecation, etc.).
+- Version lineage: JSF 1.0-1.2 (J2EE 1.4 / Java EE 5) -> JSF 2.0-2.3 (Java EE 6-8) -> Faces 3.0 (Jakarta EE 9, javax->jakarta rename only) -> Faces 4.0-4.1 (Jakarta EE 10-11, spec overhaul; FSS deprecated in 4.1) -> Faces 5.0 (Jakarta EE 12, in progress; CSP nonce support via `ENABLE_CSP_NONCE`, `FacesMessage.Severity` enum with new `SUCCESS` severity, `placeholder` attribute on input components, `EnumConverter` auto-discovers enum type, deprecation of legacy `http://java.sun.com` and `http://xmlns.jcp.org` XML namespaces, etc.).
 - Use "Faces" when speaking generically; use "JSF" only when referring specifically to pre-4.0 versions.
 - The `javax.faces.` package applies to JSF 1.0-2.3 only; the `jakarta.faces.` package applies to Faces 3.0+.
 
