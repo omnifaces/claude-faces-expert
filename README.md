@@ -1,6 +1,6 @@
 # Claude Faces Expert
 
-*Version 1.1.0*
+*Version 1.2.0*
 
 Drop-in Jakarta Faces knowledge base for [Claude Code](https://claude.com/claude-code).
 Makes Claude Code more aware of Jakarta Faces (formerly JSF) best practices, common pitfalls, and diagnostic decision trees.
@@ -35,21 +35,32 @@ Why is this important? Below is an exampe conversation with Opus 4.6:
 
 ## Installation
 
+### Project scope (default)
+
 From your project root, run:
 
 ```sh
 curl -sL https://raw.githubusercontent.com/omnifaces/claude-faces-expert/main/install.sh | sh
 ```
 
-This copies the knowledge base and slash commands into `.claude/`, and adds the `@.claude/faces/rules.md` reference to your `CLAUDE.md` (creates it if needed).
+This copies the knowledge base and slash commands into `./.claude/`, and adds the `@.claude/faces/rules.md` reference to your project's `CLAUDE.md` (creates it if needed). To update later, re-run the same command.
 
-To update later, re-run the same command.
+### User scope (applies to all projects)
+
+To install once into your home directory and have the rules apply to every project Claude Code touches, run:
+
+```sh
+curl -sL https://raw.githubusercontent.com/omnifaces/claude-faces-expert/main/install.sh | sh -s -- --user
+```
+
+This copies into `~/.claude/` and adds the `@~/.claude/faces/rules.md` reference to your global `~/.claude/CLAUDE.md` (creates it if needed). The layout under `~/.claude/faces/` is identical to the project layout.
 
 ### Manual installation
 
-If you don't want to run `curl` based installers, you can install manually as follows:
+If you don't want to run `curl`-based installers, install manually:
 
 ```sh
+# Project scope:
 git clone https://github.com/omnifaces/claude-faces-expert /tmp/claude-faces-expert
 mkdir -p .claude/faces .claude/skills
 cp -r /tmp/claude-faces-expert/.claude/faces/* .claude/faces/
@@ -57,7 +68,7 @@ cp -r /tmp/claude-faces-expert/.claude/skills/* .claude/skills/
 rm -rf /tmp/claude-faces-expert
 ```
 
-Then add this line to your `CLAUDE.md` (create one if it doesn't exist):
+Then add this line to your `CLAUDE.md` (or `~/.claude/CLAUDE.md` for user scope, with `@~/.claude/faces/rules.md`):
 
 ```
 Jakarta Faces rules: @.claude/faces/rules.md

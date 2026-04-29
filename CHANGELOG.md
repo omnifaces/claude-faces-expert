@@ -1,5 +1,22 @@
 # Changelog
 
+## 1.2.0
+
+### Installer
+- `install.sh` now supports `--user` flag for installing into `~/.claude/` (applies to all projects). Default behavior (project-local install into `./.claude/`) is unchanged.
+- Layout under `~/.claude/faces/` mirrors the project layout — same paths, same cross-references; no path rewriting needed.
+
+### Knowledge Base — Updated
+- **rules.md**:
+  - New **Injectable Faces Types** subsection under CDI: typed `@Inject` targets, Servlet-provided types, `jakarta.faces.annotation` Map qualifiers, `@Inject @ManagedProperty`.
+  - New **System Events and Phase Listeners** subsection: CDI `@Observes` with `@BeforePhase`/`@AfterPhase`/`@PreRenderView`, etc.
+  - New **View Metadata** subsection: `<f:metadata>`, `<f:viewParam>`, `<f:viewAction>` with placement rules.
+  - Faces 5.0 added to version lineage.
+  - `@ClientWindowScoped` clarified: `jfwid` mechanism, semantics.
+  - `/WEB-INF/resources` rule clarified: requires `WEBAPP_RESOURCES_DIRECTORY` context-param.
+  - `UISelectMany` rule annotated with `UnsupportedOperationException` reason.
+  - Cross-form `execute`/`process` clarified.
+
 ## 1.1.0
 
 ### Knowledge Base — New Topics
