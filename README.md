@@ -1,6 +1,6 @@
 # Claude Faces Expert
 
-*Version 1.2.0*
+*Version 1.2.1*
 
 Drop-in Jakarta Faces knowledge base for [Claude Code](https://claude.com/claude-code).
 Makes Claude Code more aware of Jakarta Faces (formerly JSF) best practices, common pitfalls, and diagnostic decision trees.
