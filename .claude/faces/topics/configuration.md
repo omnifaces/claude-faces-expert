@@ -71,6 +71,7 @@ All assets/templates/includes/tagfiles/composites MUST be placed inside `WEB-INF
 ```
 |-- WEB-INF/
 |    |-- includes/
+|    |    `-- include.xhtml
 |    |-- resources/
 |    |    |-- components/
 |    |    |    `-- composite.xhtml

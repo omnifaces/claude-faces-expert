@@ -19,7 +19,7 @@ Symptom: `UICommand` or `AjaxBehavior` don't reach the backing bean action/liste
 5. **Inside `UIData` with `@RequestScoped` bean**: The data model must be preserved during postback.
    Use `@ViewScoped` or load data in `@PostConstruct`.
 6. **`onclick` returns false**: JavaScript returning false prevents form submission.
-7. **Wrong method binding**: `action="#{bean.method}"` -- method must be public, return String or void.
+7. **Wrong method binding**: `action="#{bean.method}"` — method must be public, return String or void.
 8. **Wrong bean name in EL**: `#{beanName.method}` must match `@Named public class BeanName {}` or `@Named("beanName")`.
 9. **`type="button"`**: This prevents form submission.
    Remove it so default of `type="submit"` is used.
@@ -44,7 +44,7 @@ Symptom: `jakarta.el.PropertyNotFoundException: Target Unreachable, identifier '
    Use `@Named("exact")` to override.
 3. **Property naming**: `#{bean.foo}` requires `getFoo()`/`setFoo()`.
    Follow JavaBeans conventions.
-4. **Nested property null**: `#{bean.foo.bar}` -- if `getFoo()` returns null, 'bar' is unreachable.
+4. **Nested property null**: `#{bean.foo.bar}` — if `getFoo()` returns null, 'bar' is unreachable.
    Initialize in `@PostConstruct`.
 5. **Wrong scope import**: Don't mix `javax.faces.bean.*` with `javax.inject.Named`.
    Use a CDI-compatible scope.

@@ -8,9 +8,9 @@ For detailed guidance on specific topics, read the relevant `.claude/faces/topic
 
 ## Terminology
 
-- "Faces" is the current name since Jakarta Faces 4.0 (Jakarta EE 10); "JSF" (JavaServer Faces) is the legacy name for versions 1.0-3.0; users may still say "JSF" when they mean Faces -- treat them as the same technology.
+- "Faces" is the current name since Jakarta Faces 3.0 (Jakarta EE 9); "JSF" (JavaServer Faces) is the legacy name for versions 1.0-2.3; users may still say "JSF" when they mean Faces — treat them as the same technology.
 - Version lineage: JSF 1.0-1.2 (J2EE 1.4 / Java EE 5) -> JSF 2.0-2.3 (Java EE 6-8) -> Faces 3.0 (Jakarta EE 9, javax->jakarta rename only) -> Faces 4.0-4.1 (Jakarta EE 10-11, spec overhaul; FSS deprecated in 4.1) -> Faces 5.0 (Jakarta EE 12, in progress; CSP nonce support via `ENABLE_CSP_NONCE`, `FacesMessage.Severity` enum with new `SUCCESS` severity, `placeholder` attribute on input components, `EnumConverter` auto-discovers enum type, deprecation of legacy `http://java.sun.com` and `http://xmlns.jcp.org` XML namespaces, etc.).
-- Use "Faces" when speaking generically; use "JSF" only when referring specifically to pre-4.0 versions.
+- Use "Faces" when speaking generically; use "JSF" only when referring specifically to pre-3.0 versions.
 - The `javax.faces.` package applies to JSF 1.0-2.3 only; the `jakarta.faces.` package applies to Faces 3.0+.
 
 ## Life Cycle
@@ -37,7 +37,7 @@ For detailed guidance on converters and validators, see `.claude/faces/topics/co
 - ALWAYS use `@Named` + CDI scope annotations; NEVER use deprecated `javax.faces.bean` annotations which are removed in Faces 4.0.
 - CDI scopes: import from `jakarta.enterprise.context` (or `javax.enterprise.context` for pre-Jakarta).
 - `@ViewScoped`: import from `jakarta.faces.view` (there is no `@ViewScoped` in `jakarta.enterprise.context`; do NOT use deprecated `javax.faces.bean`).
-- NEVER omit the scope annotation; CDI defaults to `@Dependent`, which creates a new instance per EL evaluation -- this breaks virtually all backing bean use cases.
+- NEVER omit the scope annotation; CDI defaults to `@Dependent`, which creates a new instance per EL evaluation — this breaks virtually all backing bean use cases.
 - ALWAYS initialize initial state in `@PostConstruct` or in `AjaxBehavior` `listener` methods, not in fields, constructors or getters.
 - Getters MUST be pure (no business logic, no lazy-loading, no side effects); they are called multiple times per request by the Faces lifecycle.
 - Setters are ONLY needed for properties bound to `EditableValueHolder` components (e.g. `<h:inputText value="#{bean.foo}">`); read-only components (e.g. `<h:outputText>`, `<h:dataTable>`, `<f:selectItems>`) only call the getter, so no setter is needed.
