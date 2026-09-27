@@ -19,6 +19,7 @@ public class OrdersBean implements Serializable {
 
     private String customer;
     private String reference;
+    private String deliveryCity;
     private String summary;
     private List<Order> orders;
 
@@ -61,6 +62,14 @@ public class OrdersBean implements Serializable {
 
     public void setReference(String reference) {
         this.reference = reference;
+    }
+
+    public String getDeliveryCity() {
+        return deliveryCity;
+    }
+
+    public void setDeliveryCity(String deliveryCity) {
+        this.deliveryCity = deliveryCity;
     }
 
     public String getSummary() {

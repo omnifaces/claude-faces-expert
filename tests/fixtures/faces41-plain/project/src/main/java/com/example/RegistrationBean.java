@@ -1,6 +1,7 @@
 package com.example;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.annotation.PostConstruct;
@@ -22,11 +23,13 @@ public class RegistrationBean implements Serializable {
     private String username;
     private String password;
     private List<String> topics;
+    private List<String> interests = new ArrayList<>();
     private List<String> availableTopics;
     private boolean newsletterEnabled;
     private boolean trialAccount;
     private int rating;
     private String membership;
+    private String postalCode;
 
     @PostConstruct
     public void init() {
@@ -91,6 +94,22 @@ public class RegistrationBean implements Serializable {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public List<String> getInterests() {
+        return interests;
+    }
+
+    public void setInterests(List<String> interests) {
+        this.interests = interests;
+    }
+
+    public String getPostalCode() {
+        return postalCode;
+    }
+
+    public void setPostalCode(String postalCode) {
+        this.postalCode = postalCode;
     }
 
     public List<String> getTopics() {
