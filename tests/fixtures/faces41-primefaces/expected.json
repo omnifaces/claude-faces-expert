@@ -34,6 +34,10 @@
     {
       "id": "dialog-needs-own-form",
       "description": "States that the <p:dialog id=\"orderDialog\"> needs its own UIForm, or that it is moved to the end of the body, even though it declares no appendTo and sits inside <h:form id=\"orderForm\">."
+    },
+    {
+      "id": "p-message-for-composite-flagged",
+      "description": "Reports the <p:message for=\"delivery\"> in orders.xhtml as empty or wrongly targeted, or asks to address it as delivery:city or to move it into the composite, even though PrimeFaces 14.0.0+ <p:message> descends into the <cmp:deliveryCity> composite and shows the messages of the <p:inputText id=\"city\"> inside it."
     }
   ]
 }

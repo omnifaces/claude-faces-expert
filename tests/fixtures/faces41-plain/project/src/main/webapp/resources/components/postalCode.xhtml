@@ -1,0 +1,13 @@
+<ui:component xmlns:h="jakarta.faces.html"
+    xmlns:ui="jakarta.faces.facelets"
+    xmlns:cc="jakarta.faces.composite">
+
+    <cc:interface>
+        <cc:attribute name="value" required="true" />
+    </cc:interface>
+
+    <cc:implementation>
+        <h:inputText id="code" value="#{cc.attrs.value}" required="true" />
+    </cc:implementation>
+
+</ui:component>

@@ -52,6 +52,10 @@
     {
       "id": "panelgroup-single-child",
       "description": "The <h:panelGroup rendered=\"#{registrationBean.trialAccount}\"> around the single \"Trial account expires in 30 days\" <h:outputText> in index.xhtml should be dropped entirely, with the rendered attribute moved onto that <h:outputText>."
+    },
+    {
+      "id": "message-for-composite",
+      "description": "The <h:message for=\"postalCode\"> in index.xhtml names the <cmp:postalCode> composite, whose own client id never receives a message, so the required <h:inputText id=\"code\"> inside it has no working message; the message belongs inside the composite's <cc:implementation>, or must be addressed as postalCode:code. Reported as an error."
     }
   ],
   "must_not": [
@@ -86,6 +90,10 @@
     {
       "id": "move-rendered-onto-panelgrid-cell-child",
       "description": "Proposes moving the rendered attribute from a <h:panelGroup> inside the <h:panelGrid> in index.xhtml onto its child, which keeps an empty cell instead of dropping the cell and therefore changes the table."
+    },
+    {
+      "id": "composite-with-own-message-flagged",
+      "description": "Reports the <cmp:topicPicker id=\"interests\"> in index.xhtml, or the <h:selectManyCheckbox id=\"topics\"> inside that composite, as missing a UIMessage, even though topicPicker.xhtml carries its own <h:message for=\"topics\"> in its <cc:implementation>."
     }
   ]
 }

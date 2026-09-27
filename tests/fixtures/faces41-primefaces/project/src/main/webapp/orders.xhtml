@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html xmlns:h="jakarta.faces.html"
     xmlns:f="jakarta.faces.core"
-    xmlns:p="primefaces">
+    xmlns:p="primefaces"
+    xmlns:cmp="jakarta.faces.composite/components">
 
     <h:head>
         <title>Orders</title>
@@ -41,6 +42,10 @@
                 <p:outputLabel for="reference" value="Reference" />
                 <p:inputText id="reference" value="#{ordersBean.reference}" />
                 <p:message for="reference" />
+
+                <p:outputLabel for="delivery" value="Delivery city" />
+                <cmp:deliveryCity id="delivery" value="#{ordersBean.deliveryCity}" />
+                <p:message for="delivery" />
 
                 <p:commandButton id="save" value="Save"
                     action="#{ordersBean.save}" process="@form" update="@form" />

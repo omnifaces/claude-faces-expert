@@ -3,7 +3,8 @@
     xmlns:f="jakarta.faces.core"
     xmlns:ui="jakarta.faces.facelets"
     xmlns:c="jakarta.tags.core"
-    xmlns:my="jakarta.faces.component">
+    xmlns:my="jakarta.faces.component"
+    xmlns:cmp="jakarta.faces.composite/components">
 
     <ui:param name="title" value="Registration" />
 
@@ -20,6 +21,14 @@
             <h:selectManyCheckbox id="topics" value="#{registrationBean.topics}">
                 <f:selectItems value="#{registrationBean.availableTopics}" />
             </h:selectManyCheckbox>
+
+            <h:outputLabel for="interests:topics" value="Interests" />
+            <cmp:topicPicker id="interests" value="#{registrationBean.interests}"
+                items="#{registrationBean.availableTopics}" />
+
+            <h:outputLabel for="postalCode:code" value="Postal code" />
+            <cmp:postalCode id="postalCode" value="#{registrationBean.postalCode}" />
+            <h:message for="postalCode" />
 
             <c:if test="#{registrationBean.newsletterEnabled}">
                 <h:outputText style="color: #c00; font-weight: bold"
