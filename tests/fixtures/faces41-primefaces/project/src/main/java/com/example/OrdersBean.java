@@ -8,6 +8,8 @@ import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 
+import org.primefaces.event.FileUploadEvent;
+
 @Named
 @ViewScoped
 public class OrdersBean implements Serializable {
@@ -38,6 +40,10 @@ public class OrdersBean implements Serializable {
 
     public void save() {
         orderService.save(reference);
+    }
+
+    public void upload(FileUploadEvent event) {
+        orderService.attach(event.getFile().getFileName(), event.getFile().getContent());
     }
 
     public void export() {

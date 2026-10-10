@@ -20,6 +20,10 @@
     {
       "id": "cross-namingcontainer-update",
       "description": "The <p:commandButton id=\"select\"> inside the orderTable updates \"summaryPanel\", which lives in another form, without a leading colon and full client id."
+    },
+    {
+      "id": "fileupload-limits-as-attributes",
+      "description": "The <p:fileUpload id=\"attachment\"> in orders.xhtml sets sizeLimit and allowTypes as attributes, which PrimeFaces 15 no longer has and Facelets silently ignores, so nothing limits the upload; they belong on a nested <p:validateFile>."
     }
   ],
   "must_not": [
@@ -38,6 +42,14 @@
     {
       "id": "p-message-for-composite-flagged",
       "description": "Reports the <p:message for=\"delivery\"> in orders.xhtml as empty or wrongly targeted, or asks to address it as delivery:city or to move it into the composite, even though PrimeFaces 14.0.0+ <p:message> descends into the <cmp:deliveryCity> composite and shows the messages of the <p:inputText id=\"city\"> inside it."
+    },
+    {
+      "id": "validatefile-flagged",
+      "description": "Reports the <p:fileUpload id=\"invoice\"> in orders.xhtml as unlimited or wrongly configured, or asks to move its limits from the nested <p:validateFile> onto attributes of <p:fileUpload>."
+    },
+    {
+      "id": "fileupload-limits-recommended-as-attributes",
+      "description": "Recommends sizeLimit or allowTypes as attributes of <p:fileUpload> on this PrimeFaces 15 project."
     }
   ]
 }

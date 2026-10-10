@@ -54,6 +54,17 @@
             <p:messages id="messages" redisplay="false" />
         </h:form>
 
+        <h:form id="uploadForm" enctype="multipart/form-data">
+            <p:fileUpload id="attachment" mode="advanced" auto="true" listener="#{ordersBean.upload}" update="uploadMessages"
+                sizeLimit="1048576" allowTypes="/(\.|\/)pdf$/" />
+
+            <p:fileUpload id="invoice" mode="advanced" auto="true" listener="#{ordersBean.upload}" update="uploadMessages">
+                <p:validateFile sizeLimit="1048576" allowTypes="/(\.|\/)pdf$/" />
+            </p:fileUpload>
+
+            <p:messages id="uploadMessages" redisplay="false" />
+        </h:form>
+
         <h:form id="summaryForm">
             <p:outputPanel id="summaryPanel">
                 <h:outputText value="#{ordersBean.summary}" />

@@ -15,6 +15,10 @@ public class OrderService {
         // Persists the order.
     }
 
+    public void attach(String fileName, byte[] content) {
+        // Stores the attachment.
+    }
+
     public void exportToPdf(List<Order> orders) {
         // Streams a PDF to the response.
     }
