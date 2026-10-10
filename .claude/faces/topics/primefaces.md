@@ -1,6 +1,6 @@
 # PrimeFaces
 
-*Version 1.7.0*
+*Version 1.8.0*
 
 PrimeFaces is the most widely used component library for Jakarta Faces. When this project includes PrimeFaces, follow these rules.
 

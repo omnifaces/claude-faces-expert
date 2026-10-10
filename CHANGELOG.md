@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.8.0
 
 ### Rules — Added
 - Since PrimeFaces 15.0.0, the `allowTypes`, `sizeLimit` and `fileLimit` of `<p:fileUpload>` live on a nested `<p:validateFile>` only; 14.0.0 introduces `<p:validateFile>`, deprecates the three attributes and drops `invalidFileMessage` and `invalidSizeMessage`. Facelets silently accepts the old attributes, so they limit nothing. `allowTypes` matches the file name or the browser-sent content type; only `contentType="true"` probes the content, as far as the configured `FileTypeDetector` can.

@@ -1,6 +1,6 @@
 # Jakarta Faces Diagnostic Decision Trees
 
-*Version 1.7.0*
+*Version 1.8.0*
 
 When a user reports one of these symptoms, walk through the causes in order.
 Each cause has a check (how to verify) and a fix (how to resolve).

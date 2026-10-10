@@ -1,6 +1,6 @@
 # Claude Faces Expert
 
-*Version 1.7.0*
+*Version 1.8.0*
 
 Drop-in Jakarta Faces knowledge base for [Claude Code](https://claude.com/claude-code), with installers for [GitHub Copilot](https://github.com/features/copilot), [Cursor](https://cursor.com), [Codex](https://developers.openai.com/codex), [OpenCode](https://opencode.ai/) and [Antigravity](https://antigravity.google).
 Makes the coding agent more aware of Jakarta Faces (formerly JSF) best practices, common pitfalls, and diagnostic decision trees.
