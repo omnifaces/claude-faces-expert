@@ -7,6 +7,12 @@
 - PrimeFaces deviates: `SelectRenderer.addSelectItem()`, the base of every PrimeFaces select renderer, drops a `noSelectionOption="true"` item whenever `hideNoSelectionOption="true"`, whatever the current value. On `<p:selectOneMenu>` with a `null` value the placeholder is then never rendered, the menu shows the first real item, and an untouched submit puts that item in the model without `required="true"` noticing. The fix is `hideNoSelectionOption="#{not empty bean.value}"` with an ajax update of the component, as the PrimeFaces showcase does. Such an item carries `data-noselection-option="true"` on its `<option>` and the `ui-noselection-option` class on its panel item, and `filter="true"` hides it while filtering.
 - `faces-review`: reports an empty `itemValue=""` placeholder as a `warning`, a `noSelectionOption="true"` on a `#{null}` placeholder without `hideNoSelectionOption="true"` as `info`, and a literal `hideNoSelectionOption="true"` on a PrimeFaces select component with a nullable value as an `error`.
 
+### Rules — Fixed
+- Since CDI 4.0 the default bean discovery mode is `annotated`, which an empty or absent `beans.xml` also means. A `@FacesConverter`/`@FacesValidator` with `managed=true` is resolved as a CDI bean, so on Faces 4.x the class needs `@Dependent`. Since Faces 5.0 these annotations are stereotypes and thereby bean defining, so it is no longer needed there. This was stated only for the OmniFaces `<o:converter>`/`<o:validator>` case, and the `ProductConverter` example lacked it. Without it, Mojarra fails the request with "could not be resolved by CDI", and MyFaces fails on first use with a `NullPointerException`, because its `FacesConverterCDIWrapper`/`FacesValidatorCDIWrapper` finds no bean to delegate to. `faces-review` reports a missing `@Dependent` on Faces 4.x as an `error`.
+
+### Rules — Changed
+- The `<o:converter>`/`<o:validator>` section states the Mojarra 5.0 exemption once, under the `managed=true` rule, and refers to Custom Converters for CDI discovery instead of repeating it.
+
 ## 1.8.0
 
 ### Rules — Added

@@ -233,7 +233,7 @@ Both require a parent component: `<o:validator>` an `EditableValueHolder`, `<o:c
 
 `OmniApplication` routes every `Application.createConverter()`/`createValidator()` through `org.omnifaces.cdi.converter.ConverterManager`/`org.omnifaces.cdi.validator.ValidatorManager`, which resolve every `@FacesConverter`/`@FacesValidator` annotated class WITHOUT `managed=true` as a CDI bean. So on Faces 4.x, `@Inject` in a converter/validator works with OmniFaces on the classpath and no `managed=true` — which is exactly what `<o:converter>`/`<o:validator>` need.
 
-- Give such a class `@Dependent`: it is needed for CDI discovery under `bean-discovery-mode="annotated"` (the CDI 4.0 default), and it keeps every attachment on its own instance so the attributes set by `<o:validator>` cannot leak into another attachment of the same class.
+- Give such a class `@Dependent`: on Faces 4.x it is needed for CDI discovery, see "Custom Converters" in `.claude/faces/topics/conversion-validation.md`, and it keeps every attachment on its own instance so the attributes set by `<o:validator>` cannot leak into another attachment of the same class.
 - Only annotated classes are covered; one registered in `faces-config.xml` gets no injection.
 - The `forClass` path is narrower: `createConverter(Application, Class)` resolves a bean only when the converter class has a public no-arg constructor and declares no public `Class` argument constructor. Constructors are not inherited, so a subclass of `EnumConverter` declaring only a no-arg constructor is still injected. The converter ID path carries no such guard.
 - For the full rules, including the standard-versus-`<o:validator>` mixing hazards and what changes in Faces 5.0, see `.claude/faces/topics/conversion-validation.md`.

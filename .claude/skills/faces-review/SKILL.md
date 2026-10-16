@@ -103,6 +103,7 @@ State the exposure from the `FacesServlet` mapping rather than assuming source d
 ### Backing Beans
 - Bean declaration, scope choice, `Serializable`, `@PostConstruct` initialization and getter purity all follow "CDI and Bean Management" and "Scope Selection" in `.claude/faces/rules.md`.
 - `UISelectMany` backing properties use mutable collections (`new ArrayList`), not `List.of()`, `Arrays.asList()`, or `Stream.toList()`.
+- On Faces 4.x, a `@FacesConverter`/`@FacesValidator` class with `managed=true` carries a bean defining annotation, normally `@Dependent`, when `beans.xml` is absent, empty or has `bean-discovery-mode="annotated"`. Report `error` when it does not: Mojarra fails the request, and MyFaces throws a `NullPointerException` on first use. Not on Faces 5.0, where these annotations are stereotypes and bean defining by themselves. See "Custom Converters" in `.claude/faces/topics/conversion-validation.md`.
 - `action` methods are used for business logic; `actionListener` is only used to prepare/gate the action.
 - Event listeners use a mechanism that exists in the detected version — see the "System Events and Phase Listeners" section in `.claude/faces/rules.md`.
 
