@@ -17,6 +17,22 @@ PrimeFaces is the most widely used component library for Jakarta Faces. When thi
 - For file downloads with ajax, use `<p:fileDownload>` which supports ajax since PrimeFaces 10; alternatively, disable ajax with `ajax="false"` on the `UICommand`.
 - Since PrimeFaces 15.0.0, `<p:fileUpload>` no longer has the `allowTypes`, `sizeLimit` and `fileLimit` attributes; put them on a nested `<p:validateFile>`, which validates both in the browser and on the server. `FileUpload.getSizeLimit()` reads only that child validator. PrimeFaces 14.0.0 introduces `<p:validateFile>`, deprecates the three attributes and drops `invalidFileMessage` and `invalidSizeMessage` altogether; on 13 and older the attributes are the only way. Facelets accepts an attribute the tag does not declare without a word and puts it in the component's attribute map, where nothing reads it, so `<p:fileUpload sizeLimit="...">` on 15 limits nothing and reports nothing. `allowTypes` matches the file name or the content type the browser sends, both chosen by the client; `FileUploadUtils.isValidType()` probes the actual content only with `<p:validateFile contentType="true">`, and then only as well as the configured `FileTypeDetector` can, e.g. Apache Tika. Where the content matters and no such detector is configured, check it in the listener, e.g. the `%PDF-` signature of a PDF.
 
+## No Selection Option
+
+PrimeFaces select components treat `hideNoSelectionOption="true"` differently from the standard renderers described in `.claude/faces/rules.md`. `SelectRenderer.addSelectItem()` drops every item with `noSelectionOption="true"` as soon as the attribute is true, whatever the current value. It does not wait until a value is selected, as Mojarra and MyFaces do. `SelectRenderer` is the base of every PrimeFaces select renderer: `<p:selectOneMenu>`, `<p:selectOneRadio>`, `<p:selectOneButton>`, `<p:selectOneListbox>`, `<p:selectManyMenu>`, `<p:selectManyCheckbox>`, `<p:selectManyButton>`, `<p:selectCheckboxMenu>`, `<p:multiSelectListbox>` and `<p:cascadeSelect>`.
+
+On `<p:selectOneMenu>` with a `null` value, the placeholder is therefore never rendered. The hidden `<select>` falls back to its first remaining option, and the menu shows that item as if it were selected. Submitting the form untouched sends the value of that item: `required="true"` does not catch it, and the model silently receives the first real item.
+
+- Make the attribute conditional on the value and update the component on change, as the PrimeFaces showcase and the integration test `selectOneMenu005` do:
+  ```xml
+  <p:selectOneMenu id="console" value="#{bean.console}" required="true" hideNoSelectionOption="#{not empty bean.console}">
+      <p:ajax update="@this" />
+      <f:selectItem itemValue="#{null}" itemLabel="Select One" noSelectionOption="true" />
+      <f:selectItems value="#{bean.consoles}" />
+  </p:selectOneMenu>
+  ```
+- `<p:selectOneMenu>` renders the `<option>` of such an item with `data-noselection-option="true"` and its panel item with the `ui-noselection-option` class. No built-in theme styles that class, so custom CSS can hook into it. With `filter="true"`, `<p:selectOneMenu>` and `<p:selectCheckboxMenu>` hide the item while a filter text is entered.
+
 ## PrimeFaces Selectors
 
 PrimeFaces Selectors `@(.css-class)` are very useful when you need to ajax-update multiple components on a particular event, you can create a marker class like `updateOnChangeFoo` and have `<p:inputText value="#{bean.foo}"><p:ajax update="@(.updateOnChangeFoo)"></p:inputText>` and add the marker class to the desired target components `<h:outputPanel id="somePanel" styleClass="updateOnChangeFoo">`.

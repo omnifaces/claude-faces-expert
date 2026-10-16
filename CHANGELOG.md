@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+### Rules — Added
+- A "please select" placeholder in a `UISelectOne` is `<f:selectItem itemValue="#{null}">`; an empty `itemValue=""` is not sufficient. `noSelectionOption="true"` does not make such a placeholder, despite its name. Together with `hideNoSelectionOption="true"` on the parent it only skips the item once the component has a value that is not this item: Mojarra `MenuRenderer` and MyFaces `SelectItemsUtils` both keep it while the value is `null`. On a `required="true"` component, `UISelectOne.validateValue()` also fails when the value equals the item value of such an item.
+- PrimeFaces deviates: `SelectRenderer.addSelectItem()`, the base of every PrimeFaces select renderer, drops a `noSelectionOption="true"` item whenever `hideNoSelectionOption="true"`, whatever the current value. On `<p:selectOneMenu>` with a `null` value the placeholder is then never rendered, the menu shows the first real item, and an untouched submit puts that item in the model without `required="true"` noticing. The fix is `hideNoSelectionOption="#{not empty bean.value}"` with an ajax update of the component, as the PrimeFaces showcase does. Such an item carries `data-noselection-option="true"` on its `<option>` and the `ui-noselection-option` class on its panel item, and `filter="true"` hides it while filtering.
+- `faces-review`: reports an empty `itemValue=""` placeholder as a `warning`, a `noSelectionOption="true"` on a `#{null}` placeholder without `hideNoSelectionOption="true"` as `info`, and a literal `hideNoSelectionOption="true"` on a PrimeFaces select component with a nullable value as an `error`.
+
 ## 1.8.0
 
 ### Rules — Added
