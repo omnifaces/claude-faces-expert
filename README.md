@@ -22,7 +22,7 @@ Why is this important? Below is an example conversation with Opus 4.6:
 
 | File | Description |
 |------|-------------|
-| `.claude/faces/rules.md` | Core rules: terminology, view state, namespaces, CDI, scopes, page authoring, resources, components, ajax, common errors |
+| `.claude/faces/rules.md` | Core rules: terminology, view state, namespaces, CDI, scopes, page authoring, resources, components, ajax, localization, common errors |
 | `.claude/faces/topics/configuration.md` | Minimal project configuration (web.xml, taglibs, component tags, directory structure) |
 | `.claude/faces/topics/diagnostics.md` | Decision trees for 6 common errors (action not invoked, target unreachable, ViewExpiredException, etc.) |
 | `.claude/faces/topics/primefaces.md` | PrimeFaces-specific rules and gotchas |

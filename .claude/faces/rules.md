@@ -262,6 +262,14 @@ For minimal project configuration (web.xml, taglibs, component tags, directory s
 - When referencing components across components implementing `NamingContainer` interface (`<h:form>`, `<h:dataTable>`, `<ui:repeat>`, `<p:dataTable>`, `<p:tabView>`, composite components, etc), use the full client ID with leading colon: `render=":otherFormId:componentId"`.
 - A component with `rendered="false"` cannot be found for ajax update; update its always-rendered wrapper instead.
 
+## Localization
+
+- NEVER put (localizable) user-facing text in a backing bean, such as a getter or method which composes a sentence for the view. The bean exposes data and conditions; the view words them.
+- Put the wording in the view, or in a resource bundle registered as `<application><resource-bundle><base-name>…</base-name><var>msg</var></resource-bundle></application>` in `faces-config.xml` and read as `#{msg['key']}`; use `<h:outputFormat value="#{msg['key']}">` with `<f:param>` for `MessageFormat` placeholders, never string concatenation in EL or Java.
+- `<message-bundle>` is a different thing: it overrides the texts of the Faces converters and validators (and of the `FacesMessage`s they create); it is not exposed as an EL variable.
+- A `FacesMessage` which a bean has to add itself, e.g. a flash message before a redirect, takes its text from the same resource bundle via `Application.getResourceBundle(FacesContext, "msg")`, so that the page and the message cannot diverge. When OmniFaces is available, `Messages.setResolver()` can map the message text of `Messages.add*` onto bundle keys once, application wide.
+- The bundle is resolved against `UIViewRoot.getLocale()`, which is derived from `<locale-config>` (`<default-locale>`, `<supported-locale>`) and the `Accept-Language` request header unless set explicitly via `<f:view locale>`.
+
 ## Common Errors and Diagnostics
 
 When encountering these errors, consult `.claude/faces/topics/diagnostics.md` for full decision trees:
