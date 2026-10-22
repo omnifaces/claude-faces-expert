@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.9.0
 
 ### Rules — Added
 - A "please select" placeholder in a `UISelectOne` is `<f:selectItem itemValue="#{null}">`; an empty `itemValue=""` is not sufficient. `noSelectionOption="true"` does not make such a placeholder, despite its name. It is only allowed together with `hideNoSelectionOption` on the parent component, and vice versa; either half alone is dead code. Together with `hideNoSelectionOption="true"` on the parent it only skips the item once the component has a value that is not this item: Mojarra `MenuRenderer` and MyFaces `SelectItemsUtils` both keep it while the value is `null`. On a `required="true"` component, `UISelectOne.validateValue()` also fails when the value equals the item value of such an item.
