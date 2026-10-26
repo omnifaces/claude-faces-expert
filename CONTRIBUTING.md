@@ -79,4 +79,4 @@ Contributors don't need to touch versions — leave that to the release commit. 
    ```
    This is what notifies anyone watching the repository for releases, and what makes `/releases/latest` resolve.
 
-The `protect-main-develop` ruleset requires a pull request on both branches, which a maintainer bypasses by repository role for steps 3 and 5.
+The `protect-main-develop` ruleset blocks deletion and force-pushes on both branches, and `protect-tags` blocks deleting or moving a pushed tag.
