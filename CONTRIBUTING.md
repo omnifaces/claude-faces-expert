@@ -31,6 +31,25 @@ If you open a PR against `main`, you'll be asked to retarget it to `develop`.
 - Hallucinated or unverifiable spec claims. If you're unsure, say so in the PR description.
 - Unrelated tooling/config changes that aren't tied to the change you're making.
 
+## AI-assisted contributions
+
+AI coding assistants are welcome.
+The same rules apply as to any other contribution, plus these:
+
+- **You are the author.**
+  You must understand every line you submit, and be able to explain and defend it in review.
+  "The AI wrote it" is not an answer to a review comment.
+- **Disclose it.**
+  State in the pull request description which tool and model you used, and for what, e.g. "Claude Code with Claude Opus 5.5 wrote the test, I wrote the fix".
+  Always include the model name and version, as your tool reports it.
+  That keeps the history accountable and traceable, and shows over time which models and versions do the job well.
+  A `Co-Authored-By` trailer in the commit message counts as disclosure when it names the model and version, e.g. `Co-Authored-By: Claude Opus 5.5`.
+- **Verify it.**
+  Check every rule, example and spec claim against the spec or the implementation before opening the pull request.
+  Never claim a behavior, a default or a spec rule you have not checked.
+
+Pull requests that ignore these rules may be closed without review.
+
 ## Integration tests
 
 `/faces-review` has a local integration suite under `tests/`: small Faces projects with violations planted on purpose, reviewed by the skill, then graded on whether the report names each violation and withholds the false positives the rules forbid.
