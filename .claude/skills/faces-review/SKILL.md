@@ -120,6 +120,7 @@ State the exposure from the `FacesServlet` mapping rather than assuming source d
 
 ### PrimeFaces (if present)
 - Consult `.claude/faces/topics/primefaces.md` and check its rules.
+- On PrimeFaces 16 and newer, report a widget patch via `PrimeFaces.widget.X.extend(` or `this._super(` as an `error`: it throws when the script loads and aborts the rest of the file. The fix is class syntax with `super`, see JavaScript in `.claude/faces/topics/primefaces.md`. On PrimeFaces 15 and older, report it as `info` only, since class syntax works there as well and survives an upgrade.
 
 ### OmniFaces (if present)
 - Consult `.claude/faces/topics/omnifaces.md` and check for opportunities to simplify code.
