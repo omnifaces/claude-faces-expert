@@ -73,17 +73,19 @@ When overriding PrimeFaces-specific CSS, ALWAYS use the exact same selector Prim
 
 ## JavaScript
 
-When patching PrimeFaces widget JavaScript (e.g. to fix a client-side bug or tweak rendering), ALWAYS use the official `extend()` pattern, NEVER reach into `prototype` directly and NEVER poll/wait for the widget to appear:
+When patching PrimeFaces widget JavaScript (e.g. to fix a client-side bug or tweak rendering), subclass the widget with class syntax, delegate via `super`, and assign the subclass back to the widget name. NEVER reach into `prototype` directly and NEVER poll/wait for the widget to appear:
 
 ```javascript
 if (PrimeFaces.widget.Slider) {
-    PrimeFaces.widget.Slider = PrimeFaces.widget.Slider.extend({
-        onSlide: function (event, ui) {
-            // override here; call this._super(event, ui) to delegate
+    PrimeFaces.widget.Slider = class extends PrimeFaces.widget.Slider {
+        onSlide(event, ui) {
+            // override here; call super.onSlide(event, ui) to delegate
         }
-    });
+    };
 }
 ```
+
+Since PrimeFaces 16.0.0 this is the only way: the widgets are JavaScript classes without the static `extend()` method, so `PrimeFaces.widget.X.extend({...})` throws a `TypeError` when the script loads, which also aborts everything after it in the same file. On PrimeFaces 15 and older the widgets are built with an `extend()`/`this._super()` class emulation, which is not a documented extension point; class syntax over such a widget works as well (verified on 15.0.13), so one patch serves both. Older versions are untested.
 
 Place such patches in a dedicated file (e.g. `primefaces-patches.js`) and load it via `<h:outputScript target="head">` inside `<h:body>` so it runs after the PrimeFaces core script. The `if (PrimeFaces.widget.X)` guard is sufficient because the widget script is loaded together with PrimeFaces core; no polling or `setInterval` workaround is needed.
 
