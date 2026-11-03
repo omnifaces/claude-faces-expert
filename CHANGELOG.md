@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.9.1
 
 ### Rules — Fixed
 - A PrimeFaces widget patch subclasses the widget with class syntax and delegates via `super`, instead of the `extend()` pattern, which was no documented extension point. Since PrimeFaces 16.0.0 the widgets are JavaScript classes without `extend()`, so `PrimeFaces.widget.X.extend({...})` throws a `TypeError` when the script loads and aborts the rest of the file. Class syntax works on PrimeFaces 15 as well, verified on 15.0.13. `faces-review` reports `extend(` or `this._super(` in a widget patch as an `error` on PrimeFaces 16 and newer, and as `info` on 15 and older.
