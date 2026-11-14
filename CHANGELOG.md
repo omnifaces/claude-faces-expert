@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.10.0
 
 ### Rules — Added
 - `rowStatePreserved="true"` is for component state which differs per row and cannot come from the row data. An iterating component keeps per row only `value`, `localValueSet`, `valid` and `submittedValue`, so any other property set from Java shows in every row. EL on the row data, such as `styleClass="#{item.marked ? 'marked' : null}"`, does the same without any view state. The attribute saves and restores every component in the table on every row change.
