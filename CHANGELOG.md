@@ -1,5 +1,24 @@
 # Changelog
 
+## Unreleased
+
+### Rules — Added
+- `rowStatePreserved="true"` is for component state which differs per row and cannot come from the row data. An iterating component keeps per row only `value`, `localValueSet`, `valid` and `submittedValue`, so any other property set from Java shows in every row. EL on the row data, such as `styleClass="#{item.marked ? 'marked' : null}"`, does the same without any view state. The attribute saves and restores every component in the table on every row change.
+- `<c:forEach>` creates physically separate components per item, `<ui:repeat>` renders one body per item. Dynamic `<h:column>`s need `<c:forEach>`. A `<c:if>` inside a composite in a `<ui:repeat>` never sees the row value, because the composite is built only once.
+- Mojarra 4.0.23/4.1.14+ skips the rendering build of a postback when all its decisions still hold, except with a `<c:forEach>` over a `Map` or `Set`, or a `<c:catch>`. Iterate over a `List` copy of `entrySet()` instead.
+- Client side state: Mojarra compresses and encrypts it by default, MyFaces only encrypts it unless `org.apache.myfaces.COMPRESS_STATE_IN_CLIENT` is set. Turning off `compressViewState` in Mojarra gains no measurable time, and a gzip response filter does not replace it, as encrypted data does not compress and the postback goes up uncompressed.
+- Server side view state acts as a CSRF token for postbacks. GET requests need `<protected-views>`, which makes an `<h:link>` carry a `jakarta.faces.Token`. A `<f:view transient="true">` view is stateless, and `@ViewScoped` beans are not required to work in it.
+- A composite component costs build time on every build, about 1.6 times the postback of the same markup as plain components, while a tag file stays close to plain. Choose a composite only for its own client ID, declared attributes or a backing component.
+- A component bound to a bean property needs a `@RequestScoped` bean, as the spec requires. Mojarra 4.0.19/4.1.10+ logs JSF1104 in Development stage when a bound component survived across requests.
+- MyFaces 4.x binds each row of a `<c:forEach>` to the item saved with the view state (MYFACES-3811). An input on `#{item.prop}` then writes into a copy without any message, always under client side state saving, and under server side state saving when the bean holds new instances. `org.apache.myfaces.STRICT_JSF_2_FACELETS_COMPATIBILITY` works around it, with side effects on `<c:set>` and `<ui:param>`. MyFaces 5.0 follows the items, as Mojarra does (MYFACES-4775).
+- On Mojarra 4.0.23/4.1.14+, recommend `com.sun.faces.restoreBuildTimeDecisions=true`, so that a build time decision which differs on the postback does not silently drop submitted values.
+- `faces-review`: reports a listener without parentheses on a method without arguments, an input on a `<c:forEach>` item on MyFaces 4.x under client side state saving or with per-request items, a `<c:forEach>` over a `Map` or `Set` on Mojarra, and `compressViewState=false` under client side state saving. New fixtures `faces41-myfaces` and `faces41-client-state` cover the main cases.
+- Diagnostics: the Development stage warning of Mojarra which names the components a changed build time decision dropped, and the stand-in plus warning when the items of a reproduced `<c:forEach>` are gone.
+
+### Rules — Fixed
+- `<ui:repeat>` is a component, so its `value` is not evaluated during the view build. The build evaluates the JSTL core tag attributes, the `src` of `<ui:include>`, the `template` of `<ui:composition>`/`<ui:decorate>`, the attributes of `<f:view>`, the `basename` of `<f:loadBundle>`, and the `id` and `binding` of components. `rendered` is evaluated by every phase which processes the component, not only by Render Response.
+- An `<f:ajax>` or `<f:event>` listener method without arguments is referenced with parentheses, `listener="#{bean.method()}"`. Without them MyFaces fails `<f:ajax>` with `MethodNotFoundException`, and otherwise each call pays a thrown exception and a second invocation.
+
 ## 1.9.1
 
 ### Rules — Fixed

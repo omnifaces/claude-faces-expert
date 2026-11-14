@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:h="jakarta.faces.html"
+    xmlns:f="jakarta.faces.core"
+    xmlns:c="jakarta.tags.core">
+
+    <h:head>
+        <title>Price list</title>
+    </h:head>
+
+    <h:body>
+
+        <h:form id="priceListForm">
+            <c:forEach items="#{priceListBean.products}" var="product">
+                <h:outputLabel for="price_#{product.id}" value="#{product.name}" />
+                <h:inputText id="price_#{product.id}" value="#{product.price}">
+                    <f:ajax listener="#{priceListBean.recalculate}" render="@form" />
+                </h:inputText>
+                <h:message for="price_#{product.id}" />
+            </c:forEach>
+
+            <h:outputText id="total" value="#{priceListBean.total}" />
+
+            <c:forEach items="#{priceListBean.surchargesByRegion}" var="surcharge">
+                <h:outputText id="surcharge_#{surcharge.key}" value="#{surcharge.key}: #{surcharge.value}" />
+            </c:forEach>
+
+            <h:commandButton id="save" value="Save" action="#{priceListBean.save}" />
+
+            <h:messages id="messages" redisplay="false" />
+        </h:form>
+
+    </h:body>
+
+</html>

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:h="jakarta.faces.html"
+    xmlns:f="jakarta.faces.core"
+    xmlns:c="jakarta.tags.core">
+
+    <h:head>
+        <title>Basket</title>
+    </h:head>
+
+    <h:body>
+
+        <h:form id="basketForm">
+            <c:forEach items="#{basketBean.lines}" var="line">
+                <h:outputLabel for="quantity_#{line.id}" value="#{line.product}" />
+                <h:inputText id="quantity_#{line.id}" value="#{line.quantity}">
+                    <f:ajax listener="#{basketBean.recalculate}" render="@form" />
+                </h:inputText>
+                <h:message for="quantity_#{line.id}" />
+
+                <h:outputLabel for="giftWrap_#{line.id}" value="Gift wrap" />
+                <h:selectBooleanCheckbox id="giftWrap_#{line.id}" value="#{line.giftWrap}">
+                    <f:ajax listener="#{basketBean.giftWrapChanged}" render="@form" />
+                </h:selectBooleanCheckbox>
+                <h:message for="giftWrap_#{line.id}" />
+            </c:forEach>
+
+            <h:outputText id="total" value="#{basketBean.total}" />
+
+            <h:commandButton id="checkout" value="Checkout" action="#{basketBean.checkout}" />
+
+            <h:messages id="messages" redisplay="false" />
+        </h:form>
+
+    </h:body>
+
+</html>

@@ -1,0 +1,31 @@
+{
+  "faces_version": "4.1",
+  "must": [
+    {
+      "id": "myfaces-foreach-item-request-scoped",
+      "description": "Reports the <h:inputText value=\"#{line.quantity}\"> inside the <c:forEach> of orderLines.xhtml as an error: on MyFaces 4.x each row is bound to the item saved with the view state, and the @RequestScoped OrderLinesBean creates new Line instances on every request, so the submitted quantity is written into a copy and never reaches the bean, without any message."
+    },
+    {
+      "id": "myfaces-ajax-listener-no-parentheses",
+      "description": "Reports <f:ajax listener=\"#{basketBean.recalculate}\"> in basket.xhtml as an error, because recalculate() takes no arguments and MyFaces then fails with MethodNotFoundException; the fix is listener=\"#{basketBean.recalculate()}\"."
+    }
+  ],
+  "must_not": [
+    {
+      "id": "foreach-item-view-scoped-flagged",
+      "description": "Reports the inputs on #{line.quantity} or #{line.giftWrap} inside the <c:forEach> of basket.xhtml as a finding of any severity (error, warning or info) because their submitted values are lost, even though the items are held by the @ViewScoped BasketBean and the project uses the default server side state saving. A remark that this would break under client side state saving is not such a finding."
+    },
+    {
+      "id": "event-listener-flagged",
+      "description": "Reports <f:ajax listener=\"#{basketBean.giftWrapChanged}\"> as failing, or as an error or warning, even though giftWrapChanged takes the AjaxBehaviorEvent. An info remark that the unused event parameter may be dropped is not such a finding."
+    },
+    {
+      "id": "parenthesized-listener-flagged",
+      "description": "Reports <f:ajax listener=\"#{orderLinesBean.refresh()}\"> in orderLines.xhtml as failing with MethodNotFoundException or as needing to take the AjaxBehaviorEvent."
+    },
+    {
+      "id": "strict-compatibility-without-caveat",
+      "description": "Recommends org.apache.myfaces.STRICT_JSF_2_FACELETS_COMPATIBILITY without mentioning that it also changes how <c:set> and <ui:param> variables are visible across inclusions."
+    }
+  ]
+}

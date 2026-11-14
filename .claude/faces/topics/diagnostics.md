@@ -32,6 +32,8 @@ Symptom: `UICommand` or `AjaxBehavior` don't reach the backing bean action/liste
 13. **jQuery handlers lost after ajax update**: Use event delegation `$(document).on(eventName, '#id', handler)` instead of direct binding `$('#id').on(eventName, handler)`.
 14. **First-click-fails (JSF 2.2 bug)**: Upgrade to JSF 2.3+ or ensure the parent form is in the ajax render.
     PrimeFaces handles this automatically.
+15. **`<f:ajax listener>` without parentheses on MyFaces**: `listener="#{bean.method}"` on a method without arguments fails with `MethodNotFoundException`.
+    Write `listener="#{bean.method()}"`, or let the method take the `AjaxBehaviorEvent`.
 
 ## Target Unreachable / PropertyNotFoundException
 
@@ -51,7 +53,7 @@ Symptom: `jakarta.el.PropertyNotFoundException: Target Unreachable, identifier '
 6. **Missing/wrong `beans.xml`**: Needs `bean-discovery-mode="all"` or `"annotated"` in `WEB-INF/`.
 7. **Deployment error**: Check server startup logs for class loading failures.
 8. **Map/list key doesn't exist**: `#{bean.map['key'].foo}` fails if map is null or key missing.
-9. **Iteration items gone on postback**, reported against the row var (`identifier 'row' resolved to null`): the rows of a build-time iteration read their element from the items live, never from the view state, so items that no longer hold them leave the rows resolving to null.
+9. **Iteration items gone on postback**, reported against the row var (`identifier 'row' resolved to null`): the rows of a build-time iteration read their element from the items live, never from the view state, so items that no longer hold them leave the rows resolving to null. MyFaces 4.x deviates: it binds each row to the item saved with the view state, see "Input Value Not Updated".
    Keep the items in a `@ViewScoped` bean, or recompute them from the relevant request parameters in the `@PostConstruct` of a `@RequestScoped` one. Saving the rows does not repair it — an element the model no longer holds cannot be restored from anywhere.
 
 ## ViewExpiredException
@@ -109,7 +111,14 @@ Symptom: `UIInput` values don't reach the backing bean setter when form is submi
 7. **Getter creates new wrapper object each call**: Initialize in `@PostConstruct` and return same instance.
 8. **Build time decision no longer holds**: a `<c:if>`, `<c:choose>`, `<c:forEach>` or `<ui:include>` that evaluates to something else than it did while the response was rendered makes the restoring build produce a different view than the one that was submitted, so the value submitted for a component it no longer produces is decoded by nothing and the state saved for it is restored into nothing.
    Faces 5.0 requires the restoring build to reproduce the decisions the previous render reached. On Mojarra 4.0.23/4.1.14+ enable `com.sun.faces.restoreBuildTimeDecisions` (default `false`); on 5.0.0-M6+ it is `org.glassfish.mojarra.restoreBuildTimeDecisions` and on by default. MyFaces replays from its `FaceletState` and needs no param.
-   Where the condition is an iteration, keep the items alive instead — its rows read their element from the items, not from the state.
+   Where the condition is an iteration, keep the items alive instead — its rows read their element from the items, not from the state. When the items are gone, Mojarra still reproduces the rows with the param, but a submitted value lands in a stand-in, and the log gets a warning which says so.
+   In Development stage, Mojarra logs a warning which names the components the restoring build produced differently than the build which rendered them.
+9. **Input on a property of a `<c:forEach>` item on MyFaces 4.x**: MyFaces 4.x binds each row to the item it saved with the view state (MYFACES-3811), so `<h:inputText value="#{item.name}">` writes into a copy which nobody refers to anymore, without any message. Under `client` state saving that is always a deserialized copy; under `server` state saving it is a copy as soon as the bean holds new instances, e.g. a `@RequestScoped` bean loading them from a database.
+   Keep the items in a `@ViewScoped` bean and use `server` state saving, or bind the input by key into the bean, e.g. `#{bean.values[item]}`, where the item only serves as a key.
+   `org.apache.myfaces.STRICT_JSF_2_FACELETS_COMPATIBILITY=true` makes MyFaces 4.x write into the item of the bean, with both state saving methods. It also changes how `<c:set>` and `<ui:param>` variables are visible across inclusions, so test the rest of the application with it.
+   MyFaces 5.0 reads the item from the items, as Mojarra does and as Faces 5.0 specifies (MYFACES-4775).
+10. **Component bound to a bean property in a scope wider than request**: the next request builds its view with a component of the previous one. Mojarra 4.0.19/4.1.10+ logs a JSF1104 warning in Development stage.
+    Remove the bean property binding, or at least make the bean `@RequestScoped` — see "Component Rules" in `.claude/faces/rules.md`.
 
 ## Component Not Found for Update/Render
 

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:h="jakarta.faces.html"
+    xmlns:f="jakarta.faces.core"
+    xmlns:c="jakarta.tags.core">
+
+    <h:head>
+        <title>Order lines</title>
+    </h:head>
+
+    <h:body>
+
+        <h:form id="orderLinesForm">
+            <h:outputLabel for="includeBackorders" value="Include backorders" />
+            <h:selectBooleanCheckbox id="includeBackorders" value="#{orderLinesBean.includeBackorders}">
+                <f:ajax listener="#{orderLinesBean.refresh()}" render="@form" />
+            </h:selectBooleanCheckbox>
+            <h:message for="includeBackorders" />
+
+            <c:forEach items="#{orderLinesBean.lines}" var="line">
+                <h:outputLabel for="quantity_#{line.id}" value="#{line.product}" />
+                <h:inputText id="quantity_#{line.id}" value="#{line.quantity}" />
+                <h:message for="quantity_#{line.id}" />
+            </c:forEach>
+
+            <h:commandButton id="save" value="Save" action="#{orderLinesBean.save}" />
+
+            <h:messages id="messages" redisplay="false" />
+        </h:form>
+
+    </h:body>
+
+</html>

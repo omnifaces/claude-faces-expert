@@ -1,0 +1,35 @@
+{
+  "faces_version": "4.1",
+  "must": [
+    {
+      "id": "compress-view-state-disabled",
+      "description": "Reports com.sun.faces.compressViewState=false in web.xml as a warning, because with client side state saving it makes the jakarta.faces.ViewState hidden field several times larger while gaining no measurable time; the fix is to remove the context parameter."
+    },
+    {
+      "id": "foreach-over-map",
+      "description": "Reports the <c:forEach items=\"#{priceListBean.surchargesByRegion}\"> over a Map in priceList.xhtml as info, because on Mojarra it forces the full second build of every postback; the fix is to iterate over a List, such as a List copy of its entrySet()."
+    },
+    {
+      "id": "mojarra-ajax-listener-no-parentheses",
+      "description": "Reports <f:ajax listener=\"#{priceListBean.recalculate}\"> on the no-argument recalculate() method as info, because Mojarra pays a thrown exception and a second invocation on every call; the fix is listener=\"#{priceListBean.recalculate()}\"."
+    }
+  ],
+  "must_not": [
+    {
+      "id": "gzip-filter-as-replacement",
+      "description": "Suggests a gzip response filter, such as the OmniFaces CompressedResponseFilter or compression by the server, as a replacement for the view state compression of Mojarra."
+    },
+    {
+      "id": "foreach-over-list-flagged",
+      "description": "Reports the <c:forEach items=\"#{priceListBean.products}\"> over a List as forcing the full second build of a postback."
+    },
+    {
+      "id": "mojarra-foreach-item-flagged",
+      "description": "Reports the <h:inputText value=\"#{product.price}\"> inside the <c:forEach> as losing its submitted value with client side state saving; that behavior is specific to MyFaces 4.x, and this project runs Mojarra with the items in a @ViewScoped bean."
+    },
+    {
+      "id": "mojarra-listener-as-error",
+      "description": "Reports <f:ajax listener=\"#{priceListBean.recalculate}\"> as an error, or claims it fails with MethodNotFoundException; on Mojarra it works and costs only performance."
+    }
+  ]
+}
