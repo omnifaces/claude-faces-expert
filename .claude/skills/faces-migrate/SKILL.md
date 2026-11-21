@@ -194,6 +194,7 @@ This is purely a package rename; no behavioral changes.
       version="4.0"
   >
   ```
+- Report backing beans which build `SelectItemGroup` instances to group options, and propose `<f:selectItemGroup>` or `<f:selectItemGroups>` in the view, with the bean exposing the plain model objects. See "Component Rules" in `.claude/faces/rules.md`. The bean-built list keeps working, so this is optional.
 - Use HTML5 doctype `<!DOCTYPE html>` (if not already).
 - If the project has a `web.xml` and its declared version lags behind Servlet 6.0 (Jakarta EE 10), update it.
   ```xml

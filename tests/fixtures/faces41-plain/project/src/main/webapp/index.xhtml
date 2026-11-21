@@ -30,6 +30,12 @@
             <cmp:postalCode id="postalCode" value="#{registrationBean.postalCode}" />
             <h:message for="postalCode" />
 
+            <h:outputLabel for="country" value="Country" />
+            <h:selectOneMenu id="country" value="#{registrationBean.country}">
+                <f:selectItems value="#{registrationBean.countries}" />
+            </h:selectOneMenu>
+            <h:message for="country" />
+
             <c:if test="#{registrationBean.newsletterEnabled}">
                 <h:outputText style="color: #c00; font-weight: bold"
                     value="You will receive the weekly newsletter." />

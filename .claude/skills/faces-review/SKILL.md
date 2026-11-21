@@ -51,6 +51,7 @@ Hand-rolled code that a built-in has since replaced. Report `info` when it merel
 | Custom converter for a standard type | implicit converters (incl. `UUID` since 4.1) | varies |
 | `Application.evaluateExpressionGet()` calls | `@Inject @ManagedProperty` | 2.3 |
 | Hand-rolled server push (one-way, server to client) | `<f:websocket>`/`<o:socket>`, or `<o:sse>` | Faces 2.3 / OmniFaces 5.2 |
+| `SelectItemGroup` instances built in a backing bean to group options | `<f:selectItemGroup>`, or `<f:selectItemGroups>` over the model objects — see "Component Rules" in `.claude/faces/rules.md` | 4.0 |
 
 A `PhaseListener` calling `Flash.setKeepMessages(true)` on every postback is not a fix for the first row: the flash saves the messages whether or not the response is a redirect, so they are rendered again on the next request and keep echoing forward. A `NavigationHandler` decorator checking `NavigationCase.isRedirect()` is sound but is global machinery for a rare case.
 

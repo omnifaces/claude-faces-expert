@@ -56,9 +56,17 @@
     {
       "id": "message-for-composite",
       "description": "The <h:message for=\"postalCode\"> in index.xhtml names the <cmp:postalCode> composite, whose own client id never receives a message, so the required <h:inputText id=\"code\"> inside it has no working message; the message belongs inside the composite's <cc:implementation>, or must be addressed as postalCode:code. Reported as an error."
+    },
+    {
+      "id": "bean-built-select-item-group",
+      "description": "RegistrationBean.init() builds SelectItemGroup instances for the <h:selectOneMenu id=\"country\"> in index.xhtml; on Faces 4.1 the groups belong in the view as <f:selectItemGroup> or <f:selectItemGroups>, with the bean exposing plain model objects. Reported as info."
     }
   ],
   "must_not": [
+    {
+      "id": "bean-built-group-above-info",
+      "description": "Reports the SelectItemGroup construction in RegistrationBean.init() as a warning or error rather than info, or flags the List.of() behind the <h:selectOneMenu id=\"country\"> as an immutable-list defect, although it backs a UISelectOne and the bean-built groups are only superseded."
+    },
     {
       "id": "component-namespace-unknown",
       "description": "Reports xmlns:my=\"jakarta.faces.component\" in index.xhtml as an unknown, invalid or version-mismatched namespace, or advises removing it, even though RatingComponent is a @FacesComponent(createTag = true) class whose <my:rating> tag lands in exactly that namespace."

@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.annotation.PostConstruct;
+import jakarta.faces.model.SelectItem;
+import jakarta.faces.model.SelectItemGroup;
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -30,6 +32,8 @@ public class RegistrationBean implements Serializable {
     private int rating;
     private String membership;
     private String postalCode;
+    private String country;
+    private List<SelectItem> countries;
 
     @PostConstruct
     public void init() {
@@ -38,6 +42,12 @@ public class RegistrationBean implements Serializable {
         trialAccount = true;
         rating = 4;
         membership = "gold";
+
+        SelectItemGroup europe = new SelectItemGroup("Europe");
+        europe.setSelectItems(new SelectItem("NL", "Netherlands"), new SelectItem("BE", "Belgium"));
+        SelectItemGroup americas = new SelectItemGroup("Americas");
+        americas.setSelectItems(new SelectItem("US", "United States"), new SelectItem("CA", "Canada"));
+        countries = List.of(europe, americas);
     }
 
     public List<String> getAvailableTopics() {
@@ -110,6 +120,18 @@ public class RegistrationBean implements Serializable {
 
     public void setPostalCode(String postalCode) {
         this.postalCode = postalCode;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public List<SelectItem> getCountries() {
+        return countries;
     }
 
     public List<String> getTopics() {
