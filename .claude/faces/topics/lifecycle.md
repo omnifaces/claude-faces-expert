@@ -1,6 +1,6 @@
 # Faces Lifecycle
 
-*Version 1.10.0*
+*Version 1.10.1*
 
 The Faces request processing lifecycle defines the order in which the server processes a Faces HTTP request.
 Understanding this lifecycle is essential for knowing when things happen and why certain rules exist.

@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.10.1
 
 ### Rules — Added
 - Option groups belong in the view, with `<f:selectItemGroup>` for static groups and `<f:selectItemGroups>` for groups from the model, both since Faces 4.0. A backing bean no longer builds `SelectItemGroup` instances for this. `faces-review` reports a bean-built group as `info` under Superseded Constructs, and `faces-migrate` proposes the tags on the way to Faces 4.0.
