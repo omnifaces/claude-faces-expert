@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+### Rules — Added
+- `<f:viewAction>`: its `if` attribute is evaluated before the `<f:viewParam>` values reach the model, unlike `<o:viewAction>`. `immediate` and `phase` move it to another phase. It is skipped when a `<f:viewParam>` fails conversion or validation, and on a postback which forwards to its view. `onPostback="#{empty session or session.new}"` together with `<o:enableRestorableView>` re-initializes a recreated view.
+
 ## 1.10.1
 
 ### Rules — Added
